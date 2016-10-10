@@ -152,3 +152,39 @@ can_move(Board,T):- Board = [_,_,T,_,_,_,_,_,_,_,_,_,_,_,e,_,_,_,_,_,_,_,_,_].
 can_move(Board,T):- Board = [_,_,e,_,_,_,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,_].
 can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,e].
 can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,e,_,_,_,_,_,_,_,_,T].
+
+%Print the Board
+/*
+O--------O--------O
+|        |        |
+|  O-----O-----O  |
+|  |     |     |  |
+|  |  O--O--O  |  |
+|  |  |     |  |  |
+O--O--O     O--O--O
+|  |  |     |  |  |
+|  |  O--O--O  |  |
+|  |     |     |  |
+|  O-----O-----O  |
+|        |        |
+O--------O--------O
+*/
+print_element([X|Y],A,N):- A=:=N,write(X).
+print_element([X|Y],A,N):- print_element(Y,A+1,N).
+print_board(Board):- 
+	print_element(Board,1,1),write('--------'),print_element(Board,1,2),write('--------'),print_element(Board,1,3),nl, 
+	write('|        |        |'),nl,
+	write('|  '),print_element(Board,1,4),write('-----'),print_element(Board,1,5),write('-----'),print_element(Board,1,6),write('  |'),nl,
+	write('|  |     |     |  |'),nl,
+	write('|  |  '),print_element(Board,1,7),write('--'),print_element(Board,1,8),write('--'),print_element(Board,1,9),write('  |  |'),nl,
+	write('|  |  |     |  |  |'),nl,
+	print_element(Board,1,10),write('--'),print_element(Board,1,11),write('--'),print_element(Board,1,12),write('     '),print_element(Board,1,13),write('--'),print_element(Board,1,14),write('--'),print_element(Board,1,15),nl,
+	write('|  |  |     |  |  |'),nl,
+	write('|  |  '),print_element(Board,1,16),write('--'),print_element(Board,1,17),write('--'),print_element(Board,1,18),write('  |  |'),nl,
+	write('|  |     |     |  |'),nl,
+	write('|  '),print_element(Board,1,19),write('-----'),print_element(Board,1,20),write('-----'),print_element(Board,1,21),write('  |'),nl,
+	write('|        |        |'),nl,
+	print_element(Board,1,22),write('--------'),print_element(Board,1,23),write('--------'),print_element(Board,1,24),nl.
+
+%print_board(['O','O','O','O','O','O','O','O','O','O','O','O','O','O','O','O','O','O','O','O','O','O','O','O']).
+
