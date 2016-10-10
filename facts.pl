@@ -37,6 +37,32 @@ position(7,1).
 position(7,4).
 position(7,7).
 
+%convert from two dimentions to one dimention
+dim(1,1,1).
+dim(1,2,2).
+dim(1,3,3).
+dim(2,2,4).
+dim(2,4,5).
+dim(2,6,6).
+dim(3,3,7).
+dim(3,4,8).
+dim(3,5,9).
+dim(4,1,10).
+dim(4,2,11).
+dim(4,3,12).
+dim(4,5,13).
+dim(4,6,14).
+dim(4,7,15).
+dim(5,3,16).
+dim(5,4,17).
+dim(5,5,18).
+dim(6,2,19).
+dim(6,4,20).
+dim(6,6,21).
+dim(7,1,22).
+dim(7,4,23).
+dim(7,7,24).
+
 %Check if the player has new score or not
 score(Board,X,Y,T):- X=:=1, Y=:=1, Board = [T,T,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
 score(Board,X,Y,T):- X=:=1, Y=:=1, Board = [T,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,_,_,_,T,_,_].
@@ -188,3 +214,18 @@ print_board(Board):-
 
 %print_board(['O','O','O','O','O','O','O','O','O','O','O','O','O','O','O','O','O','O','O','O','O','O','O','O']).
 
+%check if the position in empty or not
+available_position([X|Y],A,N):- A=:=N,X=:='e'.
+available_position([X|Y],A,N):- A=\=N,available_position(Y,A+1,N).
+
+%check if the move is correct or not
+check(Board,X,Y,T):-position(X,Y),dim(X,Y,Z),write(Z),available_position(Board,1,Z).
+check(Board,X,Y,T):-write('Incorrect, this position is not available').
+
+%playing the game
+play(Board,T):- write('Enter the number of row: '),nl,read(X),
+	write('Enter the number of column: '),nl,read(Y),
+	check(Board,X,Y,T).
+play(Board,T):- play(Board,T).
+
+new_game():- play(['e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e'],'T').
