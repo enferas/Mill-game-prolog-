@@ -297,24 +297,24 @@ neighbor(22,23).
   |        |        |
 7 O--------O--------O
 */
-print_element([X|Y],A,N):- A=:=N,write(X).
-print_element([X|Y],A,N):- print_element(Y,A+1,N).
+print_element([X|_],1):-write(X).
+print_element([_|Y],N):-N1 is N-1,print_element(Y,N1).
 print_board(Board):- 
 	write('  1  2  3  4  5  6  7'),nl,
-	write('1 '),print_element(Board,1,1),write('--------'),print_element(Board,1,2),write('--------'),print_element(Board,1,3),nl, 
+	write('1 '),print_element(Board,1),write('--------'),print_element(Board,2),write('--------'),print_element(Board,3),nl, 
 	write('  |        |        |'),nl,
-	write('2 |  '),print_element(Board,1,4),write('-----'),print_element(Board,1,5),write('-----'),print_element(Board,1,6),write('  |'),nl,
+	write('2 |  '),print_element(Board,4),write('-----'),print_element(Board,5),write('-----'),print_element(Board,6),write('  |'),nl,
 	write('  |  |     |     |  |'),nl,
-	write('3 |  |  '),print_element(Board,1,7),write('--'),print_element(Board,1,8),write('--'),print_element(Board,1,9),write('  |  |'),nl,
+	write('3 |  |  '),print_element(Board,7),write('--'),print_element(Board,8),write('--'),print_element(Board,9),write('  |  |'),nl,
 	write('  |  |  |     |  |  |'),nl,
-	write('4 '),print_element(Board,1,10),write('--'),print_element(Board,1,11),write('--'),print_element(Board,1,12),write('     '),
-		print_element(Board,1,13),write('--'),print_element(Board,1,14),write('--'),print_element(Board,1,15),nl,
+	write('4 '),print_element(Board,10),write('--'),print_element(Board,11),write('--'),print_element(Board,12),write('     '),
+		print_element(Board,13),write('--'),print_element(Board,14),write('--'),print_element(Board,15),nl,
 	write('  |  |  |     |  |  |'),nl,
-	write('5 |  |  '),print_element(Board,1,16),write('--'),print_element(Board,1,17),write('--'),print_element(Board,1,18),write('  |  |'),nl,
+	write('5 |  |  '),print_element(Board,16),write('--'),print_element(Board,17),write('--'),print_element(Board,18),write('  |  |'),nl,
 	write('  |  |     |     |  |'),nl,
-	write('6 |  '),print_element(Board,1,19),write('-----'),print_element(Board,1,20),write('-----'),print_element(Board,1,21),write('  |'),nl,
+	write('6 |  '),print_element(Board,19),write('-----'),print_element(Board,20),write('-----'),print_element(Board,21),write('  |'),nl,
 	write('  |        |        |'),nl,
-	write('7 '),print_element(Board,1,22),write('--------'),print_element(Board,1,23),write('--------'),print_element(Board,1,24),nl.
+	write('7 '),print_element(Board,22),write('--------'),print_element(Board,23),write('--------'),print_element(Board,24),nl.
 
 %print_board(['e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e']).
 
@@ -372,7 +372,7 @@ play(Board,T,N):- N<7,nl,print_board(Board),nl,
 play(Board,T,N):- N<7,write('Incorrect, this position is not available'),nl,play(Board,T,N).
 
 %the second part of the game (move the pieces)
-play(Board,T,N):- \+ can_move(Board,T),another_player(T,T1),write('The game is finished. THE WINNER IS THE PLAYER: ***'),write(T1),,write(' ***'),nl,
+play(Board,T,N):- \+ can_move(Board,T),another_player(T,T1),write('The game is finished. THE WINNER IS THE PLAYER: ***'),write(T1),write(' ***'),nl,
 	count_piece(Board,R1,R2),write('Player a has '),write(R1),write(' pieces.'),nl,write('Player b has '),write(R2),write(' pieces.'),nl.
 play(Board,T,N):- nl,print_board(Board),nl,
 	write('***** Player '),write(T),write(' *****'),nl,
