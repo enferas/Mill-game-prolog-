@@ -213,6 +213,73 @@ can_delete(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,_,_],
 can_delete(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,_],\+ triple(Board,23,T).
 can_delete(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T],\+ triple(Board,24,T).
 
+%check if the two positions are neigbors or not.
+neighbor(1,2).
+neighbor(1,10).
+neighbor(10,1).
+neighbor(2,1).
+neighbor(2,3).
+neighbor(2,5).
+neighbor(3,2).
+neighbor(3,15).
+neighbor(15,3).
+neighbor(4,5).
+neighbor(4,11).
+neighbor(11,4).
+neighbor(5,2).
+neighbor(5,4).
+neighbor(5,6).
+neighbor(5,8).
+neighbor(6,5).
+neighbor(6,14).
+neighbor(14,6).
+neighbor(7,8).
+neighbor(7,12).
+neighbor(12,7).
+neighbor(8,5).
+neighbor(8,7).
+neighbor(8,9).
+neighbor(9,8).
+neighbor(10,11).
+neighbor(11,10).
+neighbor(11,12).
+neighbor(12,11).
+neighbor(13,14).
+neighbor(14,13).
+neighbor(14,15).
+neighbor(15,14).
+neighbor(12,16).
+neighbor(16,12).
+neighbor(13,9).
+neighbor(9,13).
+neighbor(13,18).
+neighbor(18,13).
+neighbor(16,17).
+neighbor(17,16).
+neighbor(17,18).
+neighbor(18,17).
+neighbor(19,20).
+neighbor(20,19).
+neighbor(20,21).
+neighbor(21,20).
+neighbor(10,22).
+neighbor(22,10).
+neighbor(20,23).
+neighbor(23,20).
+neighbor(23,24).
+neighbor(24,23).
+neighbor(14,21).
+neighbor(21,14).
+neighbor(19,11).
+neighbor(11,19).
+neighbor(20,17).
+neighbor(17,20).
+neighbor(24,15).
+neighbor(15,24).
+neighbor(23,22).
+neighbor(22,23).
+
+
 %Print the Board
 /*
   1  2  3  4  5  6  7
@@ -273,6 +340,9 @@ remove_piece([X|L],[X|L1],N):-N1 is N-1,remove_piece(L,L1,N1).
 %check if the move (delete piece) is correct or not
 check_delete_piece(Board,X,Y,T):- position(X,Y),dim(X,Y,Z),position_has_Tpiece(Board,Z,T),\+ triple(Board,Z,T).
 
+%check if the move (move piece) is correct or not
+check_move_piece(Board,X,Y,T):- position(X,Y),dim(X,Y,Z),position_has_Tpiece(Board,Z,T).
+
 %delete one piece from the against player when the player have new triple
 delete_piece(Board,T,Board):- another_player(T,T1),\+ can_delete(Board,T1),write('you have new triple but you cannot delete any piece.'),nl.
 delete_piece(Board,T,NewBoard):- write('You have new triple so you can choose one piece from the other pieces to delete it'),nl,
@@ -285,14 +355,34 @@ delete_piece(Board,T,NewBoard):- write('Incorrect, this move is not available'),
 check_triple(Board,X,T,NewBoard):- triple(Board,X,T),delete_piece(Board,T,NewBoard).
 check_triple(L,_,_,L).
 
+%Count the pieces for every player
+count_piece([],0,0).
+count_piece([a|Y],R,Q):- count_piece(Y,W,Q),R is W + 1.
+count_piece([b|Y],R,Q):- count_piece(Y,R,E),Q is E + 1.
+count_piece([e|Y],R,Q):- count_piece(Y,R,Q).
 
 %playing the game
-play(Board,T):- nl,print_board(Board),nl,
+%the first part of the game (add pieces)
+play(Board,T,N):- N<7,nl,print_board(Board),nl,
 	write('***** Player '),write(T),write(' *****'),nl,
 	write('Enter the number of row: '),nl,read(X),
 	write('Enter the number of column: '),nl,read(Y),
 	check_add_piece(Board,X,Y,T),dim(X,Y,Z),add_piece(Board,NewBoard,T,Z),
-	check_triple(NewBoard,Z,T,NewBoard2),another_player(T,T1),play(NewBoard2,T1).
-play(Board,T):- write('Incorrect, this position is not available'),nl,play(Board,T).
+	check_triple(NewBoard,Z,T,NewBoard2),another_player(T,T1),N1 is N+1,play(NewBoard2,T1,N1).
+play(Board,T,N):- N<7,write('Incorrect, this position is not available'),nl,play(Board,T,N).
 
-new_game():- play(['e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e'],'a').
+%the second part of the game (move the pieces)
+play(Board,T,N):- \+ can_move(Board,T),another_player(T,T1),write('The game is finished. THE WINNER IS THE PLAYER: ***'),write(T1),,write(' ***'),nl,
+	count_piece(Board,R1,R2),write('Player a has '),write(R1),write(' pieces.'),nl,write('Player b has '),write(R2),write(' pieces.'),nl.
+play(Board,T,N):- nl,print_board(Board),nl,
+	write('***** Player '),write(T),write(' *****'),nl,
+	write('You should move one piece to the empty neighbor'),nl,
+	write('Enter the number of row to the piece: '),nl,read(X1),
+	write('Enter the number of column to the piece: '),nl,read(Y1),
+	write('Enter the number of row to the position: '),nl,read(X2),
+	write('Enter the number of column to the position: '),nl,read(Y2),
+	check_add_piece(Board,X2,Y2,T),check_move_piece(Board,X1,Y1,T),dim(X2,Y2,Z2),dim(X1,Y1,Z1),neighbor(Z1,Z2),add_piece(Board,NewBoard,T,Z2),
+	remove_piece(NewBoard,NewBoard2,Z1), check_triple(NewBoard2,Z2,T,NewBoard3),another_player(T,T1),play(NewBoard3,T1,N).
+play(Board,T,N):- write('Incorrect, this move is not available'),nl,play(Board,T,N).
+
+new_game():- play(['e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e'],'a',1).
