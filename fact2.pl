@@ -73,55 +73,54 @@ dim(7,7,24).
 :- assert(board([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])). 
 
 %Check if the player has new score or not
-score(Board,X,Y,T):- X=:=1, Y=:=1, Board = [T,T,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
-score(Board,X,Y,T):- X=:=1, Y=:=1, Board = [T,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,_,_,_,T,_,_].
-score(Board,X,Y,T):- X=:=1, Y=:=4, Board = [T,T,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
-score(Board,X,Y,T):- X=:=1, Y=:=4, Board = [_,T,_,_,T,_,_,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
-score(Board,X,Y,T):- X=:=1, Y=:=7, Board = [T,T,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
-score(Board,X,Y,T):- X=:=1, Y=:=7, Board = [_,_,T,_,_,_,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,T].
-score(Board,X,Y,T):- X=:=2, Y=:=2, Board = [_,_,_,T,T,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
-score(Board,X,Y,T):- X=:=2, Y=:=2, Board = [_,_,_,T,_,_,_,_,_,_,T,_,_,_,_,_,_,_,T,_,_,_,_,_].
-score(Board,X,Y,T):- X=:=2, Y=:=4, Board = [_,_,_,T,T,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
-score(Board,X,Y,T):- X=:=2, Y=:=4, Board = [_,T,_,_,T,_,_,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
-score(Board,X,Y,T):- X=:=2, Y=:=6, Board = [_,_,_,T,T,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
-score(Board,X,Y,T):- X=:=2, Y=:=6, Board = [_,_,_,_,_,T,_,_,_,_,_,_,_,T,_,_,_,_,_,_,T,_,_,_].
-score(Board,X,Y,T):- X=:=3, Y=:=3, Board = [_,_,_,_,_,_,T,T,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
-score(Board,X,Y,T):- X=:=3, Y=:=3, Board = [_,_,_,_,_,_,T,_,_,_,_,T,_,_,_,T,_,_,_,_,_,_,_,_].
-score(Board,X,Y,T):- X=:=3, Y=:=4, Board = [_,_,_,_,_,_,T,T,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
-score(Board,X,Y,T):- X=:=3, Y=:=4, Board = [_,T,_,_,T,_,_,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
-score(Board,X,Y,T):- X=:=3, Y=:=5, Board = [_,_,_,_,_,_,T,T,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
-score(Board,X,Y,T):- X=:=3, Y=:=5, Board = [_,_,_,_,_,_,_,_,T,_,_,_,T,_,_,_,_,T,_,_,_,_,_,_].
-score(Board,X,Y,T):- X=:=4, Y=:=1, Board = [_,_,_,_,_,_,_,_,_,T,T,T,_,_,_,_,_,_,_,_,_,_,_,_].
-score(Board,X,Y,T):- X=:=4, Y=:=1, Board = [T,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,_,_,_,T,_,_].
-score(Board,X,Y,T):- X=:=4, Y=:=2, Board = [_,_,_,_,_,_,_,_,_,T,T,T,_,_,_,_,_,_,_,_,_,_,_,_].
-score(Board,X,Y,T):- X=:=4, Y=:=2, Board = [_,_,_,T,_,_,_,_,_,_,T,_,_,_,_,_,_,_,T,_,_,_,_,_].
-score(Board,X,Y,T):- X=:=4, Y=:=3, Board = [_,_,_,_,_,_,_,_,_,T,T,T,_,_,_,_,_,_,_,_,_,_,_,_].
-score(Board,X,Y,T):- X=:=4, Y=:=3, Board = [_,_,_,_,_,_,T,_,_,_,_,T,_,_,_,T,_,_,_,_,_,_,_,_].
-score(Board,X,Y,T):- X=:=4, Y=:=5, Board = [_,_,_,_,_,_,_,_,_,_,_,_,T,T,T,_,_,_,_,_,_,_,_,_].
-score(Board,X,Y,T):- X=:=4, Y=:=5, Board = [_,_,_,_,_,_,_,_,T,_,_,_,T,_,_,_,_,T,_,_,_,_,_,_].
-score(Board,X,Y,T):- X=:=4, Y=:=6, Board = [_,_,_,_,_,T,_,_,_,_,_,_,_,T,_,_,_,_,_,_,T,_,_,_].
-score(Board,X,Y,T):- X=:=4, Y=:=6, Board = [_,_,_,_,_,_,_,_,_,_,_,_,T,T,T,_,_,_,_,_,_,_,_,_].
-score(Board,X,Y,T):- X=:=4, Y=:=7, Board = [_,_,_,_,_,_,_,_,_,_,_,_,T,T,T,_,_,_,_,_,_,_,_,_].
-score(Board,X,Y,T):- X=:=4, Y=:=7, Board = [_,_,T,_,_,_,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,T].
-score(Board,X,Y,T):- X=:=5, Y=:=3, Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,T,T,_,_,_,_,_,_].
-score(Board,X,Y,T):- X=:=5, Y=:=3, Board = [_,_,_,_,_,_,T,_,_,_,_,T,_,_,_,T,_,_,_,_,_,_,_,_].
-score(Board,X,Y,T):- X=:=5, Y=:=4, Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,T,T,_,_,_,_,_,_].
-score(Board,X,Y,T):- X=:=5, Y=:=4, Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,_,_,T,_,_,T,_].
-score(Board,X,Y,T):- X=:=5, Y=:=5, Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,T,T,_,_,_,_,_,_].
-score(Board,X,Y,T):- X=:=5, Y=:=5, Board = [_,_,_,_,_,_,_,_,T,_,_,_,T,_,_,_,_,T,_,_,_,_,_,_].
-score(Board,X,Y,T):- X=:=6, Y=:=2, Board = [_,_,_,T,_,_,_,_,_,_,T,_,_,_,_,_,_,_,T,_,_,_,_,_].
-score(Board,X,Y,T):- X=:=6, Y=:=2, Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,T,T,_,_,_].
-score(Board,X,Y,T):- X=:=6, Y=:=4, Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,T,T,_,_,_].
-score(Board,X,Y,T):- X=:=6, Y=:=4, Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,_,_,T,_,_,T,_].
-score(Board,X,Y,T):- X=:=6, Y=:=6, Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,T,T,_,_,_].
-score(Board,X,Y,T):- X=:=6, Y=:=6, Board = [_,_,_,_,_,T,_,_,_,_,_,_,_,T,_,_,_,_,_,_,T,_,_,_].
-score(Board,X,Y,T):- X=:=7, Y=:=1, Board = [T,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,_,_,_,T,_,_].
-score(Board,X,Y,T):- X=:=7, Y=:=1, Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,T,T].
-score(Board,X,Y,T):- X=:=7, Y=:=4, Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,T,T].
-score(Board,X,Y,T):- X=:=7, Y=:=4, Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,_,_,T,_,_,T,_].
-score(Board,X,Y,T):- X=:=7, Y=:=7, Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,T,T].
-score(Board,X,Y,T):- X=:=7, Y=:=7, Board = [_,_,T,_,_,_,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,T].
-
+score(Board,T):- Board = [T,T,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+score(Board,T):- Board = [T,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,_,_,_,T,_,_].
+score(Board,T):- Board = [T,T,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+score(Board,T):- Board = [_,T,_,_,T,_,_,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+score(Board,T):- Board = [T,T,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+score(Board,T):- Board = [_,_,T,_,_,_,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,T].
+score(Board,T):- Board = [_,_,_,T,T,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+score(Board,T):- Board = [_,_,_,T,_,_,_,_,_,_,T,_,_,_,_,_,_,_,T,_,_,_,_,_].
+score(Board,T):- Board = [_,_,_,T,T,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+score(Board,T):- Board = [_,T,_,_,T,_,_,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+score(Board,T):- Board = [_,_,_,T,T,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+score(Board,T):- Board = [_,_,_,_,_,T,_,_,_,_,_,_,_,T,_,_,_,_,_,_,T,_,_,_].
+score(Board,T):- Board = [_,_,_,_,_,_,T,T,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+score(Board,T):- Board = [_,_,_,_,_,_,T,_,_,_,_,T,_,_,_,T,_,_,_,_,_,_,_,_].
+score(Board,T):- Board = [_,_,_,_,_,_,T,T,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+score(Board,T):- Board = [_,T,_,_,T,_,_,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+score(Board,T):- Board = [_,_,_,_,_,_,T,T,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+score(Board,T):- Board = [_,_,_,_,_,_,_,_,T,_,_,_,T,_,_,_,_,T,_,_,_,_,_,_].
+score(Board,T):- Board = [_,_,_,_,_,_,_,_,_,T,T,T,_,_,_,_,_,_,_,_,_,_,_,_].
+score(Board,T):- Board = [T,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,_,_,_,T,_,_].
+score(Board,T):- Board = [_,_,_,_,_,_,_,_,_,T,T,T,_,_,_,_,_,_,_,_,_,_,_,_].
+score(Board,T):- Board = [_,_,_,T,_,_,_,_,_,_,T,_,_,_,_,_,_,_,T,_,_,_,_,_].
+score(Board,T):- Board = [_,_,_,_,_,_,_,_,_,T,T,T,_,_,_,_,_,_,_,_,_,_,_,_].
+score(Board,T):- Board = [_,_,_,_,_,_,T,_,_,_,_,T,_,_,_,T,_,_,_,_,_,_,_,_].
+score(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,T,T,T,_,_,_,_,_,_,_,_,_].
+score(Board,T):- Board = [_,_,_,_,_,_,_,_,T,_,_,_,T,_,_,_,_,T,_,_,_,_,_,_].
+score(Board,T):- Board = [_,_,_,_,_,T,_,_,_,_,_,_,_,T,_,_,_,_,_,_,T,_,_,_].
+score(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,T,T,T,_,_,_,_,_,_,_,_,_].
+score(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,T,T,T,_,_,_,_,_,_,_,_,_].
+score(Board,T):- Board = [_,_,T,_,_,_,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,T].
+score(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,T,T,_,_,_,_,_,_].
+score(Board,T):- Board = [_,_,_,_,_,_,T,_,_,_,_,T,_,_,_,T,_,_,_,_,_,_,_,_].
+score(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,T,T,_,_,_,_,_,_].
+score(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,_,_,T,_,_,T,_].
+score(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,T,T,_,_,_,_,_,_].
+score(Board,T):- Board = [_,_,_,_,_,_,_,_,T,_,_,_,T,_,_,_,_,T,_,_,_,_,_,_].
+score(Board,T):- Board = [_,_,_,T,_,_,_,_,_,_,T,_,_,_,_,_,_,_,T,_,_,_,_,_].
+score(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,T,T,_,_,_].
+score(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,T,T,_,_,_].
+score(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,_,_,T,_,_,T,_].
+score(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,T,T,_,_,_].
+score(Board,T):- Board = [_,_,_,_,_,T,_,_,_,_,_,_,_,T,_,_,_,_,_,_,T,_,_,_].
+score(Board,T):- Board = [T,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,_,_,_,T,_,_].
+score(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,T,T].
+score(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,T,T].
+score(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,_,_,T,_,_,T,_].
+score(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,T,T].
+score(Board,T):- Board = [_,_,T,_,_,_,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,T].
 
 
 %check if the player can make a move ot not
@@ -206,11 +205,28 @@ O--O--O     O--O--O
 |        |        |
 O--------O--------O
 */
+%check is the board is full
+notfull([X]):- X==0.
+notfull([X|_]):- X==0.
+notfull([Y|L]):- Y\==0,notfull(L).
 
+full([X]):- X\==0.
+full([X|L]):- X\==0,full(L).
+
+available_position([X|_],1):- X=:=0.
+available_position([_|Y],N):-N1 is N-1,available_position(Y,N1).
+check(Board,Z):-available_position(Board,Z).
+
+rockit([_|L],[P|L],P,1).
+rockit([X|L],[X|L1],P,N):-N1 is N-1,rockit(L,L1,P,N1).
+
+
+%/*fusion to list */
 fusion([X],[Y],[X]):- X > Y .
 fusion([X],[Y],[Y]):- X =< Y .
 fusion([X|L1],[Y|L2],[X|L3]):- X > Y ,fusion(L1,L2,L3).
 fusion([X|L1],[Y|L2],[Y|L3]):- X =< Y ,fusion(L1,L2,L3).
+%print element
 
 print_element([X|_],1):-write(X).
 print_element([_|Y],N):-N1 is N-1,print_element(Y,N1).
@@ -231,13 +247,14 @@ print_board(Board):-
     write('|        |        |'),nl,
     print_element(Board,22),write('--------'),print_element(Board,23),write('--------'),print_element(Board,24) ,nl.
 
-    available_position([X|_],1):- X=:=0.
-    available_position([_|Y],N):-N1 is N-1,available_position(Y,N1).
+    
+    
+    
+    play(Board):-(score(Board,5),write('delete one rock 9 :'),nl,read(Z),rockit(Board,B,0,Z),asserta(lisst(B)),print_board(B),play2(B));(read(Z),check(Board,Z),rockit(Board,B,9,Z),asserta(lisst(B)),print_board(B),
+    notfull(B),play2(B)).
 
-    check(Board,Z):-available_position(Board,Z).
-    rockit([_|L],[P|L],P,1).
-    rockit([X|L],[X|L1],P,N):-N1 is N-1,rockit(L,L1,P,N1).
-    play(Board,P,Z):-check(Board,Z),rockit(Board,B,P,Z),lisst(A),fusion(A,B,C),asserta(lisst(C)),print_board(C).
-
-
+  
+    play2(Board):-(score(Board,9),write('delete one rock 5 :'),nl,read(Z),rockit(Board,B,0,Z),asserta(lisst(B)),print_board(B),play(B));read(Z),check(Board,Z),rockit(Board,B,5,Z),asserta(lisst(B)),print_board(B),
+    notfull(B),play(B).
+    
     
