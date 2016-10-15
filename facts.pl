@@ -385,4 +385,4 @@ play(Board,T,N):- nl,print_board(Board),nl,
 	remove_piece(NewBoard,NewBoard2,Z1), check_triple(NewBoard2,Z2,T,NewBoard3),another_player(T,T1),play(NewBoard3,T1,N).
 play(Board,T,N):- write('Incorrect, this move is not available'),nl,play(Board,T,N).
 
-new_game():- play(['e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e'],'a',1).
+new_game:- play(['e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e'],'a',1).
