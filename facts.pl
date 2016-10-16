@@ -343,23 +343,29 @@ check_delete_piece(Board,X,Y,T):- position(X,Y),dim(X,Y,Z),position_has_Tpiece(B
 %check if the move (move piece) is correct or not
 check_move_piece(Board,X,Y,T):- position(X,Y),dim(X,Y,Z),position_has_Tpiece(Board,Z,T).
 
-%delete one piece from the against player when the player have new triple
-delete_piece(Board,T,Board):- another_player(T,T1),\+ can_delete(Board,T1),write('you have new triple but you cannot delete any piece.'),nl.
-delete_piece(Board,T,NewBoard):- write('You have new triple so you can choose one piece from the other pieces to delete it'),nl,
-	write('Enter the number of row: '),nl,read(X),
-	write('Enter the number of column: '),nl,read(Y),
-	another_player(T,T1),check_delete_piece(Board,X,Y,T1),dim(X,Y,Z),remove_piece(Board,NewBoard,Z).
-delete_piece(Board,T,NewBoard):- write('Incorrect, this move is not available'),nl,delete_piece(Board,T,NewBoard).
-
-%check if the player has triple
-check_triple(Board,X,T,NewBoard):- triple(Board,X,T),delete_piece(Board,T,NewBoard).
-check_triple(L,_,_,L).
-
 %Count the pieces for every player
 count_piece([],0,0).
 count_piece([a|Y],R,Q):- count_piece(Y,W,Q),R is W + 1.
 count_piece([b|Y],R,Q):- count_piece(Y,R,E),Q is E + 1.
 count_piece([e|Y],R,Q):- count_piece(Y,R,Q).
+
+%delete one piece from the against player when the player have new triple
+delete_piece(Board,T,Board):- another_player(T,T1),\+ can_delete(Board,T1),write('you have new triple but you cannot delete any piece.'),nl.
+
+delete_piece(Board,T,NewBoard):- write('You have new triple so you can choose one piece from the other pieces to delete it'),nl,
+	write('Enter the number of row: '),nl,read(X),
+	write('Enter the number of column: '),nl,read(Y),
+	another_player(T,T1),check_delete_piece(Board,X,Y,T1),dim(X,Y,Z),remove_piece(Board,NewBoard,Z),
+	count_piece(NewBoard,H,R),((H>2,R>2);((H<3;R<3),print_board(NewBoard),nl,write('Only TWO pieces left for the opposite player'),nl,
+	write('***************You wiiiiiiiin!!!!! GAME IS OVER************************'),
+	halt)).
+
+
+delete_piece(Board,T,NewBoard):- write('Incorrect, this move is not available'),nl,delete_piece(Board,T,NewBoard).
+
+%check if the player has triple
+check_triple(Board,X,T,NewBoard):- triple(Board,X,T),delete_piece(Board,T,NewBoard).
+check_triple(L,_,_,L).
 
 %playing the game
 %the first part of the game (add pieces)
