@@ -348,7 +348,7 @@ position_has_Tpiece([T|_],1,T).
 position_has_Tpiece([_|Y],N,T):- N>0 ,N1 is N-1,position_has_Tpiece(Y,N1,T).
 
 %check if the move (add piece) is correct or not
-check_add_piece(Board,X,Y,T):-position(X,Y),dim(X,Y,Z),available_position(Board,Z).
+check_add_piece(Board,X,Y):-position(X,Y),dim(X,Y,Z),available_position(Board,Z).
 
 %add piece to the Board
 add_piece([_|L],[P|L],P,1).
@@ -401,7 +401,7 @@ select_positions(X,Y):-neighbor(X,Y).
 select_positions(X,Y):-row(X,_,Y).
 select_positions(X,Y):-column(X,_,Y).
 
-%Compter think for the first part
+%Compter think for the game
 %add piece
 %H1: make two choices for example if you have two pieces (1,4) & (4,1) play the piece in position (1,1).
 %H2: if there are two pieces in the same row or in the same column play the third one for example of you have (1,1) & (1,4) play (1,7).
@@ -415,13 +415,19 @@ select_positions(X,Y):-column(X,_,Y).
 %H8 delete one of two pieces in the same row or column to prevent the another player to get triple.
 %H9 delete on of two pieces will make two choices with add another piece
 %H10 delete a piece with a big number of connections
+%move piece
+%H11 if the player can have a triple in one move
+%H12 prevent the other player to have triple by move one piece
 %************************************************************************************
 
-%print the delete computer movment
+%print the delete in the computer turn
 computer_print_delet(Z):- dim(A,B,Z),write("The computer delete the piece("),write(A),write(","),write(B),write(")."),nl.
 
-%print the add computer movment
+%print the add in the computer turn
 computer_print_add(Z):- dim(A,B,Z),write("The computer add the piece("),write(A),write(","),write(B),write(")."),nl.
+
+%print the move in the computer turn
+computer_print_move(Z1,Z):- dim(A1,B1,Z1),dim(A,B,Z),write("The computer move the piece from("),write(A1),write(","),write(B1),write(") to ("),write(A),write(","),write(B),write(")"),nl.
 
 h7(Board,NewBoard,T):- another_player(T,T1), select_positions(X,Y),select_positions(Y,Z),X\=Z,\+ all_permutations(X,Y,Z),position_has_Tpiece(Board,Y,T1),position_has_Tpiece(Board,X,T1),
 	all_permutations(X,Y,Z1),available_position(Board,Z1),all_permutations(Y,Z,Z2),available_position(Board,Z2),
@@ -484,7 +490,7 @@ h4(Board,NewBoard,T):- available_position(Board,5),add_piece(Board,NewBoard1,T,5
 h4(Board,NewBoard,T):- available_position(Board,11),add_piece(Board,NewBoard1,T,11),computer_check_triple(NewBoard1,11,T,NewBoard),computer_print_add(11).
 h4(Board,NewBoard,T):- available_position(Board,14),add_piece(Board,NewBoard1,T,14),computer_check_triple(NewBoard1,14,T,NewBoard),computer_print_add(14).
 h4(Board,NewBoard,T):- available_position(Board,20),add_piece(Board,NewBoard1,T,20),computer_check_triple(NewBoard1,20,T,NewBoard),computer_print_add(20).
-h4(Board,NewBoard,T):- available_position(Board,2),add_piece(Board,NewBoard1,T,Y2),computer_check_triple(NewBoard1,2,T,NewBoard),computer_print_add(2).
+h4(Board,NewBoard,T):- available_position(Board,2),add_piece(Board,NewBoard1,T,2),computer_check_triple(NewBoard1,2,T,NewBoard),computer_print_add(2).
 h4(Board,NewBoard,T):- available_position(Board,8),add_piece(Board,NewBoard1,T,8),computer_check_triple(NewBoard1,8,T,NewBoard),computer_print_add(8).
 h4(Board,NewBoard,T):- available_position(Board,10),add_piece(Board,NewBoard1,T,10),computer_check_triple(NewBoard1,10,T,NewBoard),computer_print_add(10).
 h4(Board,NewBoard,T):- available_position(Board,12),add_piece(Board,NewBoard1,T,12),computer_check_triple(NewBoard1,12,T,NewBoard),computer_print_add(12).
@@ -511,6 +517,12 @@ h5(Board,NewBoard,T):- another_player(T,T1),select_positions(X,Y),select_positio
 h6(Board,NewBoard,T):- another_player(T,T1),all_permutations(X,Y,Z),available_position(Board,Z),position_has_Tpiece(Board,X,T1),
 	position_has_Tpiece(Board,Y,T1),add_piece(Board,NewBoard1,T,Z),computer_print_add(Z),computer_check_triple(NewBoard1,Z,T,NewBoard).
 
+h11(Board,NewBoard,T):- all_permutations(X,Y,Z),neighbor(Z,Z1),Y\=Z1,position_has_Tpiece(Board,X,T),position_has_Tpiece(Board,Y,T),position_has_Tpiece(Board,X,Z1),available_position(Board,Z),
+	add_piece(Board,NewBoard1,T,Z), remove_piece(NewBoard1,NewBoard2,Z1),computer_check_triple(NewBoard2,Z,T,NewBoard),computer_print_move(Z1,Z).
+
+h12(Board,NewBoard,T):- another_player(T,T1),all_permutations(X,Y,Z),neighbor(Z,Z1),neighbor(Z,Z2),Y\=Z1,Y\=Z2,position_has_Tpiece(Board,X,T1),position_has_Tpiece(Board,Y,T1),available_position(Board,Z)
+	,position_has_Tpiece(Board,Z1,T1),position_has_Tpiece(Board,Z2,T),add_piece(Board,NewBoard1,T,Z), remove_piece(NewBoard1,NewBoard,Z2),computer_print_move(Z2,Z).
+
 %************************************************************************************
 
 %playing the game
@@ -521,7 +533,7 @@ play(Board,T,N):- 1 is (N mod 2),N<19,nl,print_board(Board),nl,
 	write('***** Player '),write(T),write(' *****'),nl,
 	write('Enter the number of row: '),nl,read(X),
 	write('Enter the number of column: '),nl,read(Y),
-	check_add_piece(Board,X,Y,T),dim(X,Y,Z),add_piece(Board,NewBoard,T,Z),
+	check_add_piece(Board,X,Y),dim(X,Y,Z),add_piece(Board,NewBoard,T,Z),
 	check_triple(NewBoard,Z,T,NewBoard2),another_player(T,T1),N1 is N+1,play(NewBoard2,T1,N1).
 play(Board,T,N):- 1 is (N mod 2),N<19,write('Incorrect, this position is not available'),nl,play(Board,T,N),!.
 %************************************************************************************
@@ -535,10 +547,11 @@ play(Board,T,N):- N<19, h4(Board,NewBoard,T), another_player(T,T1),N1 is N+1,pla
 %************************************************************************************
 %the second part of the game (move the pieces)
 %************************************************************************************
-play(Board,T,N):- count_piece(Board,E,Q),E < 3,another_player(T,T1),write('The game is finished. THE WINNER IS THE PLAYER: *** '),write(T1),write(' ***'),nl,
-	write('Player a has '),write(R1),write(' pieces.'),nl,write('Player b has '),write(R2),write(' pieces.'),nl.
-play(Board,T,N):- count_piece(Board,E,Q),Q < 3,another_player(T,T1),write('The game is finished. THE WINNER IS THE PLAYER: *** '),write(T1),write(' ***'),nl,
-	write('Player a has '),write(R1),write(' pieces.'),nl,write('Player b has '),write(R2),write(' pieces.'),nl.
+%The player turn
+play(Board,T,_):- count_piece(Board,E,Q),E < 3,another_player(T,T1),write('The game is finished. THE WINNER IS THE PLAYER: *** '),write(T1),write(' ***'),nl,
+	write('Player a has '),write(E),write(' pieces.'),nl,write('Player b has '),write(Q),write(' pieces.'),nl.
+play(Board,T,_):- count_piece(Board,E,Q),Q < 3,another_player(T,T1),write('The game is finished. THE WINNER IS THE PLAYER: *** '),write(T1),write(' ***'),nl,
+	write('Player a has '),write(E),write(' pieces.'),nl,write('Player b has '),write(Q),write(' pieces.'),nl.
 play(Board,T,N):- 1 is (N mod 2),\+ can_move(Board,T),another_player(T,T1),write('The game is finished. THE WINNER IS THE PLAYER: *** '),write(T1),write(' ***'),nl,
 	count_piece(Board,R1,R2),write('Player a has '),write(R1),write(' pieces.'),nl,write('Player b has '),write(R2),write(' pieces.'),nl.
 play(Board,T,N):- 1 is (N mod 2),nl,print_board(Board),nl,
@@ -548,9 +561,12 @@ play(Board,T,N):- 1 is (N mod 2),nl,print_board(Board),nl,
 	write('Enter the number of column to the piece: '),nl,read(Y1),
 	write('Enter the number of row to the position: '),nl,read(X2),
 	write('Enter the number of column to the position: '),nl,read(Y2),
-	check_add_piece(Board,X2,Y2,T),check_move_piece(Board,X1,Y1,T),dim(X2,Y2,Z2),dim(X1,Y1,Z1),neighbor(Z1,Z2),add_piece(Board,NewBoard,T,Z2),
+	check_add_piece(Board,X2,Y2),check_move_piece(Board,X1,Y1,T),dim(X2,Y2,Z2),dim(X1,Y1,Z1),neighbor(Z1,Z2),add_piece(Board,NewBoard,T,Z2),
 	remove_piece(NewBoard,NewBoard2,Z1), check_triple(NewBoard2,Z2,T,NewBoard3),another_player(T,T1),play(NewBoard3,T1,N).
 play(Board,T,N):- 1 is (N mod 2),write('Incorrect, this move is not available'),nl,play(Board,T,N).
 %************************************************************************************
+%The computer turn
+play(Board,T,N):- h11(Board,NewBoard,T),another_player(T,T1),N1 is N+1,play(NewBoard,T1,N1).
+play(Board,T,N):- h12(Board,NewBoard,T),another_player(T,T1),N1 is N+1,play(NewBoard,T1,N1).
 
 new_game:- play(['e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e'],'a',1).
