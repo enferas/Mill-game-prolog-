@@ -426,6 +426,7 @@ select_positions(X,Y):-column(X,_,Y).
 %H11 if the player can have a triple in one move
 %H12 prevent the other player to have triple by move one piece
 %H13 if the player can have a triple in tow moves
+%H13 prevent the player can have a triple in tow moves
 %************************************************************************************
 
 %print the delete in the computer turn
@@ -544,7 +545,21 @@ h12(Board,NewBoard,T):- another_player(T,T1),all_permutations(X,Y,Z),neighbor(Z,
 h13(Board,NewBoard,T):- all_permutations(X,Y,Z),neighbor(Z,Z1),Y\=Z1,position_has_Tpiece(Board,X,T),position_has_Tpiece(Board,Y,T),position_has_Tpiece(Board,Z,T),available_position(Board,Z1),
 	add_piece(Board,NewBoard1,T,Z1), remove_piece(NewBoard1,NewBoard,Z).
 
-
+h14(Board,NewBoard,T):-
+                        another_player(T,T1),
+                        all_permutations(X,Y,Z),
+                        neighbor(Z,Z1),
+                        neighbor(Z1,Z2),
+                        \+neighbor(X,Z2),
+                        \+neighbor(Y,Z2),
+                        Y\=Z1,
+                        position_has_Tpiece(Board,X,T1), 
+                        position_has_Tpiece(Board,Y,T1),
+                        position_has_Tpiece(Board,Z,T1),
+                        position_has_Tpiece(Board,Z2,T),
+                        available_position(Board,Z1),
+                        add_piece(Board,NewBoard1,T,Z2),
+                        remove_piece(NewBoard1,NewBoard,Z2).
 
 %************************************************************************************
 
@@ -591,6 +606,12 @@ play(Board,T,N):-  0 is (N mod 2),N<19, write('multi connextion'),nl,h4(Board,Ne
 %the second part of the game (move the pieces)
 %************************************************************************************
 %The player turn
+play(Board,T,_):- count_piece(Board,E,Q),E < 3,another_player(T,T1),write('The game is finished. THE WINNER IS THE PLAYER: *** '),write(T1),write(' ***'),nl,
+	write('Player a has '),write(E),write(' pieces.'),nl,write('Player b has '),write(Q),write(' pieces.'),nl.
+play(Board,T,_):- count_piece(Board,E,Q),Q < 3,another_player(T,T1),write('The game is finished. THE WINNER IS THE PLAYER: *** '),write(T1),write(' ***'),nl,
+	write('Player a has '),write(E),write(' pieces.'),nl,write('Player b has '),write(Q),write(' pieces.'),nl.
+play(Board,T,N):- 1 is (N mod 2),\+ can_move(Board,T),another_player(T,T1),write('The game is finished. THE WINNER IS THE PLAYER: *** '),write(T1),write(' ***'),nl,
+	count_piece(Board,R1,R2),write('Player a has '),write(R1),write(' pieces.'),nl,write('Player b has '),write(R2),write(' pieces.'),nl.
 play(Board,T,N):- 1 is (N mod 2),nl,print_board(Board),nl,
 	write('***** Player '),write(T),write(' *****'),nl,
 	write('You should move one piece to the empty neighbor'),nl,
@@ -604,8 +625,10 @@ play(Board,T,N):- 1 is (N mod 2),write('Incorrect, this move is not available'),
 %************************************************************************************
 %The computer turn
 
-play(Board,T,N):- 0 is (N mod 2),write('remove triple'),h11(Board,NewBoard,T),another_player(T,T1),N1 is N+1,play(NewBoard,T1,N1),!.
-play(Board,T,N):- 0 is (N mod 2),write('remove triple'),h12(Board,NewBoard,T),another_player(T,T1),N1 is N+1,play(NewBoard,T1,N1),!.
+play(Board,T,N):- 0 is (N mod 2),write('add triple'),h11(Board,NewBoard,T),another_player(T,T1),N1 is N+1,play(NewBoard,T1,N1),!.
+play(Board,T,N):- 0 is (N mod 2),write('prevent triple'),h12(Board,NewBoard,T),another_player(T,T1),N1 is N+1,play(NewBoard,T1,N1),!.
 play(Board,T,N):- 0 is (N mod 2),write('remove triple'),h13(Board,NewBoard,T),another_player(T,T1),N1 is N+1,play(NewBoard,T1,N1),!.
+play(Board,T,N):- 0 is (N mod 2),write('prevent the other to remove triple'),h14(Board,NewBoard,T),another_player(T,T1),N1 is N+1,play(NewBoard,T1,N1),!.
+
 
 new_game:- play(['e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e'],'a',1).
