@@ -1,0 +1,858 @@
+
+% e empty position
+% a first player
+% b second player
+
+%Change between players
+another_player(a,b).
+another_player(b,a).
+
+% Positions
+% the first row
+position(1,1).
+position(1,4).
+position(1,7).
+
+%the sesecond row
+position(2,2).
+position(2,4).
+position(2,6).
+
+%the third row
+position(3,3).
+position(3,4).
+position(3,5).
+
+%the fourth row
+position(4,1).
+position(4,2).
+position(4,3).
+position(4,5).
+position(4,6).
+position(4,7).
+
+%the fifth row
+position(5,3).
+position(5,4).
+position(5,5).
+
+%the sixth row
+position(6,2).
+position(6,4).
+position(6,6).
+
+%the seventh row
+position(7,1).
+position(7,4).
+position(7,7).
+
+%convert from two dimentions to one dimention
+dim(1,1,1).                   %%every postion take a nbr form 1 to 24 using x,y corrdinates
+dim(1,4,2).
+dim(1,7,3).
+dim(2,2,4).
+dim(2,4,5).
+dim(2,6,6).
+dim(3,3,7).
+dim(3,4,8).
+dim(3,5,9).
+dim(4,1,10).
+dim(4,2,11).
+dim(4,3,12).
+dim(4,5,13).
+dim(4,6,14).
+dim(4,7,15).
+dim(5,3,16).
+dim(5,4,17).
+dim(5,5,18).
+dim(6,2,19).
+dim(6,4,20).
+dim(6,6,21).
+dim(7,1,22).
+dim(7,4,23).
+dim(7,7,24).
+
+%check if the two positions are neigbors or not.
+neighbor(1,2).
+neighbor(1,10).
+neighbor(10,1).
+neighbor(2,1).
+neighbor(2,3).
+neighbor(2,5).
+neighbor(3,2).
+neighbor(3,15).
+neighbor(15,3).
+neighbor(4,5).
+neighbor(4,11).
+neighbor(11,4).
+neighbor(5,2).
+neighbor(5,4).
+neighbor(5,6).
+neighbor(5,8).
+neighbor(6,5).
+neighbor(6,14).
+neighbor(14,6).
+neighbor(7,8).
+neighbor(7,12).
+neighbor(12,7).
+neighbor(8,5).
+neighbor(8,7).
+neighbor(8,9).
+neighbor(9,8).
+neighbor(10,11).
+neighbor(11,10).
+neighbor(11,12).
+neighbor(12,11).
+neighbor(13,14).
+neighbor(14,13).
+neighbor(14,15).
+neighbor(15,14).
+neighbor(12,16).
+neighbor(16,12).
+neighbor(13,9).
+neighbor(9,13).
+neighbor(13,18).
+neighbor(18,13).
+neighbor(16,17).
+neighbor(17,16).
+neighbor(17,18).
+neighbor(18,17).
+neighbor(19,20).
+neighbor(20,19).
+neighbor(20,21).
+neighbor(21,20).
+neighbor(10,22).
+neighbor(22,10).
+neighbor(20,23).
+neighbor(23,20).
+neighbor(23,24).
+neighbor(24,23).
+neighbor(14,21).
+neighbor(21,14).
+neighbor(19,11).
+neighbor(11,19).
+neighbor(20,17).
+neighbor(17,20).
+neighbor(24,15).
+neighbor(15,24).
+neighbor(23,22).
+neighbor(22,23).
+
+%Rows in the board   %%write postions on row form and comuùsn forms
+row(1,2,3).
+row(4,5,6).
+row(7,8,9).
+row(10,11,12).
+row(13,14,15).
+row(16,17,18).
+row(19,20,21).
+row(22,23,24).
+
+%Columns in the board
+column(1,10,22).
+column(2,5,8).
+column(3,15,24).
+column(4,11,19).
+column(6,14,21).
+column(7,12,16).
+column(9,13,18).
+column(17,20,23).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%nbr of paht that leads to the position:
+nbrpath(1,2).
+nbrpath(2,3).
+nbrpath(3,2).
+nbrpath(4,2).
+nbrpath(5,4).
+nbrpath(6,2).
+nbrpath(7,2).
+nbrpath(8,3).
+nbrpath(9,2).
+nbrpath(10,3).
+nbrpath(11,4).
+nbrpath(12,3).
+nbrpath(13,3).
+nbrpath(14,4).
+nbrpath(15,3).
+nbrpath(16,2).
+nbrpath(17,3).
+nbrpath(18,2).
+nbrpath(19,2).
+nbrpath(20,4).
+nbrpath(21,2).
+nbrpath(22,2).
+nbrpath(23,3).
+nbrpath(24,2).
+
+
+score(H,T,S,Board):-ne(H,Res),%write('H is on est dans score  '),write(H),write(' res  is les vosiisn '),nl,write(Res),
+              another_player(T,T1),%write('board is '),write(Board),
+              neop(Board,Res,T1,Resf),length(Resf,N),
+             % write('nbr voisin eff is '),write(N),write('  liste des voisiisn ennemie '),write(Resf),nl,
+              nbrpath(H,Pa),S is Pa+N.%,write(' la somme S est '),write(S),nl.
+
+
+bestposition(Board,[H|Y],T,Po,SPo):-%write('la 1 er est '),write(H),write(' Y est '),write(Y),nl,
+                             %write('boars is '),write(Board),nl,
+                             score(H,T,S,Board),
+                             %write('S before sending is '),write(S),nl,
+                             bestpositionacc(Board,Y,T,Po,SPo,H,S).%,
+                            % write('al la fin la position est '),write(Po),nl.
+
+bestpositionacc(Board,[],T,Po,SPo,Po,SPo).%:-write('vide  Po est '),write(Po),write(' SPo est '),write(SPo),nl.
+bestpositionacc(Board,[A|B],T,Po,SPo,AccPo,AccSPo):-score(A,T,S,Board),S>AccSPo,
+                                                    %write(' score test is lower then  '),%,write(AccPo),write(' AccSPo '),write(AccSPo),nl,
+                                                    bestpositionacc(Board,B,T,Po,SPo,A,S).
+                                                  
+bestpositionacc(Board,[A|B],T,Po,SPo,AccPo,AccSPo):-score(A,T,S,Board),S=<AccSPo,
+                                                 % write(' AccPO is '),write(AccPo),write(' AccSPo '),write(AccSPo),nl,
+                                                  bestpositionacc(Board,B,T,Po,SPo,AccPo,AccSPo).
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%scores for h10%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+scoreh10(H,T,S,Board,2):-ne(H,Res),write('H is on est dans score  '),write(H),write(' res  is les vosiisn '),nl,write(Res),
+              another_player(T,T1),%write('board is '),write(Board),
+              neop(Board,Res,T1,Resf),length(Resf,N),
+              write('nbr voisin eff is '),write(N),write('  liste des voisiisn ennemie '),write(Resf),nl,
+              nbrpath(H,Pa),getsp2(N,Pa,Sc),
+              S is Sc,write(' la somme S est '),write(S),nl.
+
+
+
+scoreh10(H,T,S,Board,3):-ne(H,Res),write('scoring in part 3 of the game'),
+                      write('H is on est dans score  '),write(H),write(' res  is les vosiisn '),nl,write(Res),
+                      another_player(T,T1),%write('board is '),write(Board),
+                      neop(Board,Res,T1,Resf),length(Resf,N),
+                      write('nbr voisin eff is '),write(N),write('  liste des voisiisn ennemie '),write(Resf),nl,
+                      S is N,write(' la somme S est '),write(S),nl.
+
+
+
+getsp2(N,Pa,Sc):-Sc1 is (7*N)/10,Sc2 is (3*Pa)/10,Sc is Sc1+Sc2.
+
+
+
+bestpositionh10(Board,[H|Y],T,Po,SPo,Gp):-%write('la 1 er est '),write(H),write(' Y est '),write(Y),nl,
+                             %write('boars is '),write(Board),nl,
+                             scoreh10(H,T,S,Board,Gp),
+                             %write('S before sending is '),write(S),nl,
+                             bestpositionacch10(Board,Y,T,Po,SPo,H,S,Gp),
+                             write('al la fin la position est '),write(Po),nl.
+
+bestpositionacch10(Board,[],T,Po,SPo,Po,SPo,Gp):-write('vide  Po est '),write(Po),write(' SPo est '),write(SPo),nl.
+bestpositionacch10(Board,[A|B],T,Po,SPo,AccPo,AccSPo,Gp):-scoreh10(A,T,S,Board,Gp),S>=AccSPo,   %%we can change it here
+                                                    write(' score test is lower then  '),%,write(AccPo),write(' AccSPo '),write(AccSPo),nl,
+                                                    bestpositionacch10(Board,B,T,Po,SPo,A,S,Gp).
+                                                  
+bestpositionacch10(Board,[A|B],T,Po,SPo,AccPo,AccSPo,Gp):-score(A,T,S,Board,Gp),S<AccSPo,
+                                                 % write(' AccPO is '),write(AccPo),write(' AccSPo '),write(AccSPo),nl,
+                                                  bestpositionacch10(Board,B,T,Po,SPo,AccPo,AccSPo,Gp).
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+ne(X,Res):-findall(Y,select_positions(X,Y),Res).  %%find all neibors   we need to do all combainaison row (X,_,Y), and row (Y,_,X)!!!!!!!!!!
+
+neop(Board,[],T1,[]):-write('pass by empty on est dans calcul des  voisin ennemy'),nl,nl.   %%find all niebors with peices enemie
+neop(Board,[A|B],T1,[A|B2]):-write(' neop  case 1 value of A is  '),write(A),
+                             position_has_Tpiece(Board,A,T1),
+                             write(' yes it has piece type  '),write(T1),write(' la liste est '),write(B),nl,%write('borad is '),write(Board),
+                             neop(Board,B,T1,B2).  %%!
+neop(Board,[A|B],T1,B2):-write(' neop  case 2 value of A is '),write(A),nl,
+                         \+position_has_Tpiece(Board,A,T1),
+                         write(' no it hasnt  '),write('la liste B est '),write(B),nl,
+                         neop(Board,B,T1,B2).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%Check if the player has new triple or not and check if there are triple so the player cannot delete antone of them.
+triple(Board,X,T):- X=:=1, Board = [T,T,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+triple(Board,X,T):- X=:=1, Board = [T,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,_,_,_,T,_,_].
+triple(Board,X,T):- X=:=2, Board = [T,T,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+triple(Board,X,T):- X=:=2, Board = [_,T,_,_,T,_,_,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+triple(Board,X,T):- X=:=3, Board = [T,T,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+triple(Board,X,T):- X=:=3, Board = [_,_,T,_,_,_,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,T].
+triple(Board,X,T):- X=:=4, Board = [_,_,_,T,T,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+triple(Board,X,T):- X=:=4, Board = [_,_,_,T,_,_,_,_,_,_,T,_,_,_,_,_,_,_,T,_,_,_,_,_].
+triple(Board,X,T):- X=:=5, Board = [_,_,_,T,T,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+triple(Board,X,T):- X=:=5, Board = [_,T,_,_,T,_,_,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+triple(Board,X,T):- X=:=6, Board = [_,_,_,T,T,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+triple(Board,X,T):- X=:=6, Board = [_,_,_,_,_,T,_,_,_,_,_,_,_,T,_,_,_,_,_,_,T,_,_,_].
+triple(Board,X,T):- X=:=7, Board = [_,_,_,_,_,_,T,T,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+triple(Board,X,T):- X=:=7, Board = [_,_,_,_,_,_,T,_,_,_,_,T,_,_,_,T,_,_,_,_,_,_,_,_].
+triple(Board,X,T):- X=:=8, Board = [_,_,_,_,_,_,T,T,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+triple(Board,X,T):- X=:=8, Board = [_,T,_,_,T,_,_,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+triple(Board,X,T):- X=:=9, Board = [_,_,_,_,_,_,T,T,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+triple(Board,X,T):- X=:=9, Board = [_,_,_,_,_,_,_,_,T,_,_,_,T,_,_,_,_,T,_,_,_,_,_,_].
+triple(Board,X,T):- X=:=10, Board = [_,_,_,_,_,_,_,_,_,T,T,T,_,_,_,_,_,_,_,_,_,_,_,_].
+triple(Board,X,T):- X=:=10, Board = [T,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,_,_,_,T,_,_].
+triple(Board,X,T):- X=:=11, Board = [_,_,_,_,_,_,_,_,_,T,T,T,_,_,_,_,_,_,_,_,_,_,_,_].
+triple(Board,X,T):- X=:=11, Board = [_,_,_,T,_,_,_,_,_,_,T,_,_,_,_,_,_,_,T,_,_,_,_,_].
+triple(Board,X,T):- X=:=12, Board = [_,_,_,_,_,_,_,_,_,T,T,T,_,_,_,_,_,_,_,_,_,_,_,_].
+triple(Board,X,T):- X=:=12, Board = [_,_,_,_,_,_,T,_,_,_,_,T,_,_,_,T,_,_,_,_,_,_,_,_].
+triple(Board,X,T):- X=:=13, Board = [_,_,_,_,_,_,_,_,_,_,_,_,T,T,T,_,_,_,_,_,_,_,_,_].
+triple(Board,X,T):- X=:=13, Board = [_,_,_,_,_,_,_,_,T,_,_,_,T,_,_,_,_,T,_,_,_,_,_,_].
+triple(Board,X,T):- X=:=14, Board = [_,_,_,_,_,T,_,_,_,_,_,_,_,T,_,_,_,_,_,_,T,_,_,_].
+triple(Board,X,T):- X=:=14, Board = [_,_,_,_,_,_,_,_,_,_,_,_,T,T,T,_,_,_,_,_,_,_,_,_].
+triple(Board,X,T):- X=:=15, Board = [_,_,_,_,_,_,_,_,_,_,_,_,T,T,T,_,_,_,_,_,_,_,_,_].
+triple(Board,X,T):- X=:=15, Board = [_,_,T,_,_,_,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,T].
+triple(Board,X,T):- X=:=16, Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,T,T,_,_,_,_,_,_].
+triple(Board,X,T):- X=:=16, Board = [_,_,_,_,_,_,T,_,_,_,_,T,_,_,_,T,_,_,_,_,_,_,_,_].
+triple(Board,X,T):- X=:=17, Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,T,T,_,_,_,_,_,_].
+triple(Board,X,T):- X=:=17, Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,_,_,T,_,_,T,_].
+triple(Board,X,T):- X=:=18, Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,T,T,_,_,_,_,_,_].
+triple(Board,X,T):- X=:=18, Board = [_,_,_,_,_,_,_,_,T,_,_,_,T,_,_,_,_,T,_,_,_,_,_,_].
+triple(Board,X,T):- X=:=19, Board = [_,_,_,T,_,_,_,_,_,_,T,_,_,_,_,_,_,_,T,_,_,_,_,_].
+triple(Board,X,T):- X=:=19, Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,T,T,_,_,_].
+triple(Board,X,T):- X=:=20, Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,T,T,_,_,_].
+triple(Board,X,T):- X=:=20, Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,_,_,T,_,_,T,_].
+triple(Board,X,T):- X=:=21, Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,T,T,_,_,_].
+triple(Board,X,T):- X=:=21, Board = [_,_,_,_,_,T,_,_,_,_,_,_,_,T,_,_,_,_,_,_,T,_,_,_].
+triple(Board,X,T):- X=:=22, Board = [T,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,_,_,_,T,_,_].
+triple(Board,X,T):- X=:=22, Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,T,T].
+triple(Board,X,T):- X=:=23, Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,T,T].
+triple(Board,X,T):- X=:=23, Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,_,_,T,_,_,T,_].
+triple(Board,X,T):- X=:=24, Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,T,T].
+triple(Board,X,T):- X=:=24, Board = [_,_,T,_,_,_,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,T].
+
+%check if the player can make a move ot not
+can_move(Board,T):- Board = [T,e,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [e,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,T,e,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,e,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,T,e,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,e,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,T,e,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,e,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,T,e,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,e,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,T,e,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,e,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,T,e,_,_,_,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,e,T,_,_,_,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,T,e,_,_,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,e,T,_,_,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,T,e,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,e,T,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,T,e,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,e,T,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,e,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,e,T,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,e,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,e,T,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,e,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,e,T,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,e,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,e,T,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,e,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,e,T,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,e].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,e,T].
+can_move(Board,T):- Board = [T,_,_,_,_,_,_,_,_,e,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [e,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,_,_,_,e,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,e,_,_,_,_,_,_,_,_,_,_,_,T,_,_].
+can_move(Board,T):- Board = [_,_,_,T,_,_,_,_,_,_,e,_,_,_,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,e,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,e,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,e,_,_,_,_,_,_,_,T,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,T,_,_,_,_,e,_,_,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,e,_,_,_,_,T,_,_,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,T,_,_,_,e,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,e,_,_,_,T,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,T,_,_,e,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,e,_,_,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,T,_,_,e,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,e,_,_,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,_,_,e,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,e,_,_,T,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,_,_,e,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,e,_,_,T,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,T,_,_,_,e,_,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,e,_,_,_,T,_,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,T,_,_,_,_,e,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,e,_,_,_,_,T,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,T,_,_,_,_,_,_,_,e,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,e,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,e,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,e,_,_,_,_,_,_,T,_,_,_].
+can_move(Board,T):- Board = [_,_,T,_,_,_,_,_,_,_,_,_,_,_,e,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,e,_,_,_,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,_].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,e].
+can_move(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,e,_,_,_,_,_,_,_,_,T].
+
+%check if there any piece to delete it or not.
+can_delete(Board,T):- Board = [T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],\+ triple(Board,1,T).
+can_delete(Board,T):- Board = [_,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],\+ triple(Board,2,T).
+can_delete(Board,T):- Board = [_,_,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],\+ triple(Board,3,T).
+can_delete(Board,T):- Board = [_,_,_,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],\+ triple(Board,4,T).
+can_delete(Board,T):- Board = [_,_,_,_,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],\+ triple(Board,5,T).
+can_delete(Board,T):- Board = [_,_,_,_,_,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],\+ triple(Board,6,T).
+can_delete(Board,T):- Board = [_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],\+ triple(Board,7,T).
+can_delete(Board,T):- Board = [_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],\+ triple(Board,8,T).
+can_delete(Board,T):- Board = [_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],\+ triple(Board,9,T).
+can_delete(Board,T):- Board = [_,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,_,_,_,_,_,_],\+ triple(Board,10,T).
+can_delete(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,_,_,_,_,_],\+ triple(Board,11,T).
+can_delete(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,_,_,_,_],\+ triple(Board,12,T).
+can_delete(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,_,_,_],\+ triple(Board,13,T).
+can_delete(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,_,_],\+ triple(Board,14,T).
+can_delete(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_,_],\+ triple(Board,15,T).
+can_delete(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_,_],\+ triple(Board,16,T).
+can_delete(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_,_],\+ triple(Board,17,T).
+can_delete(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,_,_,_,_,_,_],\+ triple(Board,18,T).
+can_delete(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,_,_,_,_,_],\+ triple(Board,19,T).
+can_delete(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,_,_,_,_],\+ triple(Board,20,T).
+can_delete(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,_,_,_],\+ triple(Board,21,T).
+can_delete(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,_,_],\+ triple(Board,22,T).
+can_delete(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T,_],\+ triple(Board,23,T).
+can_delete(Board,T):- Board = [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,T],\+ triple(Board,24,T).
+
+
+%Print the Board
+/*
+  1  2  3  4  5  6  7
+1 O--------O--------O
+  |        |        |
+2 |  O-----O-----O  |
+  |  |     |     |  |
+3 |  |  O--O--O  |  |
+  |  |  |     |  |  |
+4 O--O--O     O--O--O
+  |  |  |     |  |  |
+5 |  |  O--O--O  |  |
+  |  |     |     |  |
+6 |  O-----O-----O  |
+  |        |        |
+7 O--------O--------O
+*/
+print_element([X|_],1):-write(X).
+print_element([_|Y],N):-N1 is N-1,print_element(Y,N1).
+print_board(Board):- 
+	write('  1      2    3    4    5    6      7                                               '),nl,
+	write('1 '),print_element(Board,1),write('----------------'),print_element(Board,2),write('----------------'),print_element(Board,3),nl, 
+	write('  |                |                |'),nl,
+	write('  |                |                |'),nl,
+	write('2 |      '),print_element(Board,4),write('---------'),print_element(Board,5),write('---------'),print_element(Board,6),write('      |'),nl,
+	write('  |      |         |         |      |'),nl,
+	write('  |      |         |         |      |'),nl,
+	write('3 |      |    '),print_element(Board,7),write('----'),print_element(Board,8),write('----'),print_element(Board,9),write('    |      |'),nl,
+	write('  |      |    |         |    |      |'),nl,
+	write('  |      |    |         |    |      |'),nl,
+	write('4 '),print_element(Board,10),write('------'),print_element(Board,11),write('----'),print_element(Board,12),write('         '),
+		print_element(Board,13),write('----'),print_element(Board,14),write('------'),print_element(Board,15),nl,
+	write('  |      |    |         |    |      |'),nl,
+	write('  |      |    |         |    |      |'),nl,
+	write('5 |      |    '),print_element(Board,16),write('----'),print_element(Board,17),write('----'),print_element(Board,18),write('    |      |'),nl,
+	write('  |      |         |         |      |'),nl,
+	write('  |      |         |         |      |'),nl,
+	write('6 |      '),print_element(Board,19),write('---------'),print_element(Board,20),write('---------'),print_element(Board,21),write('      |'),nl,
+	write('  |                |                |'),nl,
+	write('  |                |                |'),nl,
+	write('7 '),print_element(Board,22),write('----------------'),print_element(Board,23),write('----------------'),print_element(Board,24),nl.
+
+%print_board(['e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e']).
+
+
+
+
+
+%check if the position in empty or not
+available_position(['e'|_],1).%:-write('la1'),nl.
+available_position([_|Y],N):-N>0 ,N1 is N-1,available_position(Y,N1).
+
+%check if the position has T piece or not
+position_has_Tpiece([T|_],1,T).
+position_has_Tpiece([_|Y],N,T):- N>0 ,N1 is N-1,position_has_Tpiece(Y,N1,T).
+
+%check if the move (add piece) is correct or not
+check_add_piece(Board,X,Y):-position(X,Y),dim(X,Y,Z),available_position(Board,Z).
+
+%add piece to the Board
+add_piece([_|L],[P|L],P,1).%:-write('p is '),write(P),write(' L is '),write(L),nl.
+add_piece([X|L],[X|L1],P,N):-N1 is N-1,%write('   en plien add P is '),write(P),write(' N is '),write(N),nl,
+                             %write('la liste est X '),write(X),write(' le reste est '),write(L),nl,
+                             add_piece(L,L1,P,N1).
+
+%remove piece from the Board
+remove_piece([_|L],['e'|L],1).
+remove_piece([X|L],[X|L1],N):-N1 is N-1,remove_piece(L,L1,N1).
+
+%check if the move (delete piece) is correct or not
+check_delete_piece(Board,X,Y,T):- position(X,Y),dim(X,Y,Z),position_has_Tpiece(Board,Z,T),\+ triple(Board,Z,T).
+
+%check if the move (move piece) is correct or not
+check_move_piece(Board,X,Y,T):- position(X,Y),dim(X,Y,Z),position_has_Tpiece(Board,Z,T).
+
+%delete one piece from the against player when the player have new triple
+delete_piece(Board,T,Board):- another_player(T,T1),\+ can_delete(Board,T1),write('you have new triple but you cannot delete any piece.'),nl.
+delete_piece(Board,T,NewBoard):- write('You have new triple so you can choose one piece from the other pieces to delete it'),nl,
+	write('Enter the number of row: '),nl,read(X),
+	write('Enter the number of column: '),nl,read(Y),
+	another_player(T,T1),check_delete_piece(Board,X,Y,T1),dim(X,Y,Z),remove_piece(Board,NewBoard,Z),write('the piece in (' ),write(X),
+        write(','),write(Y),write(') had been deleted by the player '),nl.  
+delete_piece(Board,T,NewBoard):- write('Incorrect, this move is not available'),nl,delete_piece(Board,T,NewBoard).
+
+%check if the player has triple
+check_triple(Board,X,T,NewBoard):- triple(Board,X,T),delete_piece(Board,T,NewBoard).
+check_triple(L,_,_,L).
+
+%Count the pieces for every player
+count_piece([],0,0).
+count_piece([a|Y],R,Q):- count_piece(Y,W,Q),R is W + 1.
+count_piece([b|Y],R,Q):- count_piece(Y,R,E),Q is E + 1.
+count_piece([e|Y],R,Q):- count_piece(Y,R,Q).
+
+%this function to generate all permutations to the triple in the same row or column
+all_permutations(X,Y,Z):- row(X,Y,Z).
+all_permutations(X,Y,Z):- row(X,Z,Y).
+all_permutations(X,Y,Z):- row(Y,X,Z).
+all_permutations(X,Y,Z):- row(Y,Z,X).
+all_permutations(X,Y,Z):- row(Z,X,Y).
+all_permutations(X,Y,Z):- row(Z,Y,X).
+all_permutations(X,Y,Z):- column(X,Y,Z).
+all_permutations(X,Y,Z):- column(X,Z,Y).
+all_permutations(X,Y,Z):- column(Y,X,Z).
+all_permutations(X,Y,Z):- column(Y,Z,X).
+all_permutations(X,Y,Z):- column(Z,X,Y).
+all_permutations(X,Y,Z):- column(Z,Y,X).
+
+%select two positions in the same row or column
+select_positions(X,Y):-neighbor(X,Y).
+select_positions(X,Y):-row(X,_,Y).
+select_positions(X,Y):-column(X,_,Y).
+
+%Compter think for the game
+%add piece
+%H1: make two choices for example if you have two pieces (1,4) & (4,1) play the piece in position (1,1).
+%H2: if there are two pieces in the same row or in the same column play the third one for example of you have (1,1) & (1,4) play (1,7).
+%H3: try to make two choices for example if you have (1,4) play (4,1) to apply H1 the next time.
+%H4: Choose position with big number of connections.  //only part1 
+%H6: prevent the other player to have two choices.  
+%H5: prevent the other player to have triple.
+%priority order: h6,h2,h1,h5,h3,h4
+%delete piece
+%H7 delete the main piece if the player have two choices.
+%H8 delete one of two pieces in the same row or column to prevent the another player to get triple.
+%H9 delete on of two pieces will make two choices with add another piece
+%H10 delete a piece with a big number of connections  //part2 and 3
+%move piece
+%H11 if the player can have a triple in one move
+%H12 prevent the other player to have triple by move one piece
+%H13 if the player can have a triple in tow moves
+%H14 prevent the player can have a triple in tow moves
+%************************************************************************************
+
+%print the delete in the computer turn
+computer_print_delet(Z):-dim(A,B,Z),write('The computer delete the piece('),write(A),write(','),write(B),write(').'),nl.
+
+%print the add in the computer turn
+computer_print_add(Z):-dim(A,B,Z),write('The computer add the piece('),write(A),write(','),write(B),write(').'),nl.
+
+%print the move in the computer turn
+computer_print_move(Z1,Z):- dim(A1,B1,Z1),dim(A,B,Z),write('The computer move the piece from('),write(A1),write(','),write(B1),write(') to ('),write(A),write(','),write(B),write(')'),nl.
+
+h7(Board,NewBoard,T):- another_player(T,T1), select_positions(X,Y),select_positions(Y,Z),X\=Z,\+ all_permutations(X,Y,Z),position_has_Tpiece(Board,Y,T1),position_has_Tpiece(Board,X,T1),
+	all_permutations(X,Y,Z1),available_position(Board,Z1),all_permutations(Y,Z,Z2),available_position(Board,Z2),
+	position_has_Tpiece(Board,Z,T1),remove_piece(Board,NewBoard,Y),computer_print_delet(Y),!.
+
+h8(Board,NewBoard,T):- another_player(T,T1), all_permutations(X,Y,Z), available_position(Board,Z),position_has_Tpiece(Board,X,T1),position_has_Tpiece(Board,Y,T1),\+ triple(Board,X,T1),remove_piece(Board,NewBoard,X).
+
+h9(Board,NewBoard,T):- another_player(T,T1), select_positions(X,Y),select_positions(Y,Z),X\=Z,\+ all_permutations(X,Y,Z),position_has_Tpiece(Board,Y,T1),position_has_Tpiece(Board,X,T1),
+	all_permutations(X,Y,Z1),available_position(Board,Z1),all_permutations(Y,Z,Z2),available_position(Board,Z2),
+	available_position(Board,Z2),remove_piece(Board,NewBoard,X),computer_print_delet(X),!.
+
+
+h10(Board,NewBoard,T,Gp):-write('start H10'),nl,
+                          another_player(T,T1),
+                          get_occ_position(Board,[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],L,T1),
+                          write('la liste des position occupé est '),write(L),nl,
+                          bestposition(Board,L,T,Po,SPo,Gp),
+                          write('position got'),write(Po),nl,
+                          remove_piece(Board,NewBoard,Po),computer_print_delet(Po). 
+
+
+
+get_occ_position(Board,[],[],T1).
+get_occ_position(Board,[H|Y],[H|Y2],T1):-position_has_Tpiece(Board,H,T1),get_occ_position(Board,Y,Y2,T1).
+get_occ_position(Board,[H|Y],Y2,T1):-position_has_Tpiece(Board,H,T1),get_occ_position(Board,Y,Y2,T1).
+
+
+
+%this herstic is not final should be changed to be more intelligent
+%h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,5,T1),remove_piece(Board,NewBoard,5),computer_print_delet(5).
+
+
+%apply priority to delete one piece
+computer_delete_piece(Board,T,NewBoard):- h7(Board,NewBoard,T).
+computer_delete_piece(Board,T,NewBoard):- h8(Board,NewBoard,T).
+computer_delete_piece(Board,T,NewBoard):- h9(Board,NewBoard,T).
+computer_delete_piece(Board,T,NewBoard):- h10(Board,NewBoard,T,Gp).
+
+%check if the computer has triple
+computer_check_triple(Board,X,T,NewBoard):- triple(Board,X,T),computer_delete_piece(Board,T,NewBoard).
+computer_check_triple(L,_,_,L).
+
+h1(Board,NewBoard,T):- select_positions(X,Y),select_positions(Y,Z),X\=Z,\+ all_permutations(X,Y,Z),available_position(Board,Y),position_has_Tpiece(Board,X,T),
+	all_permutations(X,Y,Z1),available_position(Board,Z1),all_permutations(Y,Z,Z2),available_position(Board,Z2),
+	position_has_Tpiece(Board,Z,T),add_piece(Board,NewBoard1,T,Y),
+        computer_print_add(Y),computer_check_triple(NewBoard1,Y,T,NewBoard),!.
+
+h2(Board,NewBoard,T):- all_permutations(X,Y,Z),available_position(Board,Z),position_has_Tpiece(Board,X,T),position_has_Tpiece(Board,Y,T),
+add_piece(Board,NewBoard1,T,Z),computer_print_add(Z),computer_check_triple(NewBoard1,Z,T,NewBoard).
+
+h3(Board,NewBoard,T):- neighbor(X,Y),neighbor(Y,Z),X\=Z,\+ all_permutations(X,Y,Z),position_has_Tpiece(Board,X,T),available_position(Board,Z),available_position(Board,Y),all_permutations(X,Y,Z1),available_position(Board,Z1),all_permutations(Y,Z,Z2),available_position(Board,Z2),add_piece(Board,NewBoard1,T,Z),computer_print_add(Z),computer_check_triple(NewBoard1,Z,T,NewBoard).
+
+%this herstic is not final should be changed to be more intelligent
+
+%L = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24].
+
+h4(Board,NewBoard,T):-write('debut H4 '),nl,%write('L est '),write(L),nl,
+                      getavailable_position(Board,[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],Av),
+                      write('les position vides sont '),write(Av),nl,
+                      %findall(N,(forall(member(N,L),available_position(Board,N))),Avposition),
+                      %write('la'),nl,
+                      bestposition(Board,Av,T,Po,SPo),
+                      %write('on est de retour p est '),write(P),nl,
+                      write('postion recue '),write(Po),write('T is '),write(T),nl,
+                      add_piece(Board,NewBoard1,T,Po),nl,write('made it '),    %% T is P (a or b)  Po is (1:24) 
+                      computer_check_triple(NewBoard1,Po,T,NewBoard),write(' we made it twice '),computer_print_add(Po).
+
+
+
+
+getavailable_position(Board,[],[]).%:-write('youhou'),nl.
+getavailable_position(Board,[H|T],[H|T2]):-%write('youhou2 '),nl,write(H),nl,
+                                           available_position(Board,H),getavailable_position(Board,T,T2).
+getavailable_position(Board,[H|T],T2):-%write('youhou3'),nl, 
+                                     \+available_position(Board,H),getavailable_position(Board,T,T2).
+
+
+
+h5(Board,NewBoard,T):- another_player(T,T1),all_permutations(X,Y,Z),available_position(Board,Z),position_has_Tpiece(Board,X,T1),
+	position_has_Tpiece(Board,Y,T1),add_piece(Board,NewBoard1,T,Z),
+        computer_print_add(Z),computer_check_triple(NewBoard1,Z,T,NewBoard).
+
+h6(Board,NewBoard,T):- another_player(T,T1),select_positions(X,Y),select_positions(Y,Z),X\=Z,\+ all_permutations(X,Y,Z),
+                       available_position(Board,Y),position_has_Tpiece(Board,X,T1),position_has_Tpiece(Board,Z,T1),
+                       write('X is '),write(X),write(' Y is '),write(Y),write(' Z is '),write(Z),nl,
+                       all_permutations(X,X2,Y),write(' X2 is '),write(X2),all_permutations(Z,Z2,X),\+position_has_Tpiece(Board,Z2,T),
+                       write(' Z2 is '),write(Z2),nl,\+position_has_Tpiece(Board,X2,T),
+                   %the heuristic will be in some how useless since little bit since there won't be 2 choises anyway we need to deicde about it
+ add_piece(Board,NewBoard1,T,Y),computer_print_add(Y),write(' H6 essayé '),computer_check_triple(NewBoard1,Y,T,NewBoard),write(' H6 succeded ').
+
+
+
+h11(Board,NewBoard,T):- all_permutations(X,Y,Z),
+neighbor(Z,Z1),
+Y\=Z1,X\=Z1,
+position_has_Tpiece(Board,X,T),
+position_has_Tpiece(Board,Y,T),
+position_has_Tpiece(Board,Z1,T),
+available_position(Board,Z),
+add_piece(Board,NewBoard1,T,Z),
+remove_piece(NewBoard1,NewBoard2,Z1),
+computer_check_triple(NewBoard2,Z,T,NewBoard),computer_print_move(Z1,Z). 
+
+h12(Board,NewBoard,T):- another_player(T,T1),all_permutations(X,Y,Z),neighbor(Z,Z1),neighbor(Z,Z2),Y\=Z1,Y\=Z2,position_has_Tpiece(Board,X,T1),position_has_Tpiece(Board,Y,T1),available_position(Board,Z)
+	,position_has_Tpiece(Board,Z1,T1),position_has_Tpiece(Board,Z2,T),add_piece(Board,NewBoard1,T,Z),remove_piece(NewBoard1,NewBoard,Z2),computer_print_move(Z2,Z).
+
+h13(Board,NewBoard,T):- all_permutations(X,Y,Z),neighbor(Z,Z1),Y\=Z1,position_has_Tpiece(Board,X,T),position_has_Tpiece(Board,Y,T),position_has_Tpiece(Board,Z,T),available_position(Board,Z1),
+	add_piece(Board,NewBoard1,T,Z1), remove_piece(NewBoard1,NewBoard,Z),computer_print_move(Z1,Z).
+
+
+h14(Board,NewBoard,T):-
+                        another_player(T,T1),                 
+                        all_permutations(X,Y,Z),
+                        neighbor(Z,Z1),
+                        neighbor(Z1,Z2),
+                        \+neighbor(X,Z2),
+                        \+neighbor(Y,Z2),
+                        Y\=Z1,
+                        position_has_Tpiece(Board,X,T1),nl,                     
+                        write('le X est '),write(X),nl,
+                        position_has_Tpiece(Board,Y,T1),
+                        write('le Y est '),write(Y),nl,
+                        position_has_Tpiece(Board,Z,T1),
+                        write('le Z est '),write(Z),nl,
+                        position_has_Tpiece(Board,Z2,T),
+                        write('le Z2 est '),write(Z2),nl,
+                        available_position(Board,Z1),write('le Z1 est '),write(Z1),nl,
+                        write('H14 tested'),
+                        add_piece(Board,NewBoard1,T,Z1),
+                        remove_piece(NewBoard1,NewBoard,Z2),write('H14 succeded'),computer_print_move(Z1,Z2).
+
+%************************************************************************************
+
+%playing the game
+%the first part of the game (add pieces)
+%************************************************************************************
+%The player turn
+play(Board,T,N):- 1 is (N mod 2),N<19,nl,print_board(Board),nl,    %%N is nbr of games
+	write('***** Player '),write(T),write(' *****'),nl,
+      
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	write('Enter the number of row: '),nl,read(X),
+	write('Enter the number of column: '),nl,read(Y),
+	check_add_piece(Board,X,Y),dim(X,Y,Z),add_piece(Board,NewBoard,T,Z),
+	check_triple(NewBoard,Z,T,NewBoard2),another_player(T,T1),N1 is N+1,write('the player add the piece '),write('('),write(X),
+        write(','),write(Y),write(')'),nl,play(NewBoard2,T1,N1).
+play(Board,T,N):- 1 is (N mod 2),N<19,write('Incorrect, this position is not available'),nl,play(Board,T,N),!.
+%************************************************************************************
+
+%Compter think for the game
+%add piece
+%H1: make two choices for example if you have two pieces (1,4) & (4,1) play the piece in position (1,1).
+%H2: if there are two pieces in the same row or in the same column play the third one for example of you have (1,1) & (1,4) play (1,7).
+%H3: try to make two choices for example if you have (1,4) play (4,1) to apply H1 the next time.
+%H4: Choose position with big number of connections.
+%H5: prevent the other player to have triple.
+%H6: prevent the other player to have two choices.
+%priority order: h6,h2,h1,h5,h3,h4
+%delete piece
+%H7 delete the main piece if the player have two choices.
+%H8 delete one of two pieces in the same row or column to prevent the another player to get triple.
+%H9 delete on of two pieces will make two choices with add another piece
+%H10 delete a piece with a big number of connections
+%move piece
+%H11 if the player can have a triple in one move
+%H12 prevent the other player to have triple by move one piece
+%************************************************************************************
+%The Computer turn
+
+play(Board,T,N):-  0 is (N mod 2),N<19,h2(Board,NewBoard,T), write('make triple heuristics was applied '),nl, 
+                   another_player(T,T1),N1 is N+1,play(NewBoard,T1,N1),!.
+play(Board,T,N):-  0 is (N mod 2),N<19,h5(Board,NewBoard,T),write('prevent triple heuristic was applied '),nl, another_player(T,T1),
+                   N1 is N+1,play(NewBoard,T1,N1),!.
+play(Board,T,N):-  0 is (N mod 2),N<19,h1(Board,NewBoard,T),write('creat choise  heuristic was applied '),nl,
+                   another_player(T,T1),N1 is N+1,play(NewBoard,T1,N1),!.
+play(Board,T,N):-  0 is (N mod 2),N<19,h6(Board,NewBoard,T),write('prevent choise heuristic was applied '),nl, 
+                   another_player(T,T1),N1 is N+1,play(NewBoard,T1,N1),!.
+play(Board,T,N):-  0 is (N mod 2),N<19,h3(Board,NewBoard,T),write('create choise heuristic was applied '),nl, 
+                   another_player(T,T1),N1 is N+1,play(NewBoard,T1,N1),!.
+play(Board,T,N):-  0 is (N mod 2),N<19,h4(Board,NewBoard,T),write('multi connexion heuristic  was applied '),nl,
+                   another_player(T,T1),N1 is N+1,play(NewBoard,T1,N1).
+%************************************************************************************
+%the second part of the game (move the pieces)
+%************************************************************************************
+%The player turn
+
+play(Board,T,_):- count_piece(Board,E,Q),E < 3,another_player(T,T1),write('The game is finished. THE WINNER IS THE PLAYER: *** '),write(T1),write(' ***'),nl,
+	write('Player a has '),write(E),write(' pieces.'),nl,write('Player b has '),write(Q),write(' pieces.'),nl.
+play(Board,T,_):- count_piece(Board,E,Q),Q < 3,another_player(T,T1),write('The game is finished. THE WINNER IS THE PLAYER: *** '),write(T1),write(' ***'),nl,
+	write('Player a has '),write(E),write(' pieces.'),nl,write('Player b has '),write(Q),write(' pieces.'),nl.
+play(Board,T,N):- 1 is (N mod 2),\+ can_move(Board,T),another_player(T,T1),write('The game is finished. THE WINNER IS THE PLAYER: *** '),write(T1),write(' ***'),nl,
+	count_piece(Board,R1,R2),write('Player a has '),write(R1),write(' pieces.'),nl,write('Player b has '),write(R2),write(' pieces.'),nl.%!
+
+
+
+play(Board,T,N):- 1 is (N mod 2),nl,print_board(Board),nl,
+	write('***** Player '),write(T),write(' *****'),nl,
+	write('You should move one piece to the empty neighbor'),nl,
+	write('Enter the number of row to the piece: '),nl,read(X1),
+	write('Enter the number of column to the piece: '),nl,read(Y1),
+	write('Enter the number of row to the position: '),nl,read(X2),
+	write('Enter the number of column to the position: '),nl,read(Y2),
+	check_add_piece(Board,X2,Y2),check_move_piece(Board,X1,Y1,T),dim(X2,Y2,Z2),dim(X1,Y1,Z1),neighbor(Z1,Z2),add_piece(Board,NewBoard,T,Z2),
+	write(' on est la 1 '),nl,remove_piece(NewBoard,NewBoard2,Z1),write(' on est la 2 '), 
+        check_triple(NewBoard2,Z2,T,NewBoard3),another_player(T,T1),write(' on est la 3 '),
+        write('the player moved the piece from '),write('('),write(X1),write(','),write(Y1),write(') '),write(' to '),write('('),
+        write(X2),write(','),write(Y2),write(')'),nl,N1 is N+1,play(NewBoard3,T1,N1),write(' till the end '),nl.
+
+play(Board,T,N):- 1 is (N mod 2),write( 'pas de chane '),write(' Incorrect, this move is not available '),nl,play(Board,T,N).
+
+%************************************************************************************
+%The computer turn
+
+play(Board,T,N):- 0 is (N mod 2),write('before h'),nl,h11(Board,NewBoard,T),write(' after h '),another_player(T,T1),N1 is N+1,
+                  play(NewBoard,T1,N1),write(' add triple heuristic  was applied '),nl,!.
+play(Board,T,N):- 0 is (N mod 2),write('before h'),nl,h12(Board,NewBoard,T),write(' after h '),another_player(T,T1),N1 is N+1,
+                  play(NewBoard,T1,N1),write(' prevent triple heuristic was applied '),nl,!.
+play(Board,T,N):- 0 is (N mod 2),write('before h'),nl,h13(Board,NewBoard,T),write(' after h '),another_player(T,T1),N1 is N+1,
+                  play(NewBoard,T1,N1),write(' remove triple heuristic was applied '),nl,!.
+play(Board,T,N):- 0 is (N mod 2),write('before h'),h14(Board,NewBoard,T),write(' after h '),another_player(T,T1),N1 is N+1,play(NewBoard,T1,N1),
+                  write(' prevent the other to remove triple heuristic was applied '),nl,!.
+
+
+%***************************************************************************************
+%the third part of the game (flaying)
+%***************************************************************************************
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%player turn
+
+play(Board,T,_):- count_piece(Board,E,Q),E < 3,another_player(T,T1),write('The game is finished. THE WINNER IS THE PLAYER: *** '),write(T1),write(' ***'),nl,
+	write('Player a has '),write(E),write(' pieces.'),nl,write('Player b has '),write(Q),write(' pieces.'),nl.
+play(Board,T,_):- count_piece(Board,E,Q),Q < 3,another_player(T,T1),write('The game is finished. THE WINNER IS THE PLAYER: *** '),write(T1),write(' ***'),nl,
+	write('Player a has '),write(E),write(' pieces.'),nl,write('Player b has '),write(Q),write(' pieces.'),nl.
+play(Board,T,N):- 1 is (N mod 2),\+ can_move(Board,T),another_player(T,T1),write('The game is finished. THE WINNER IS THE PLAYER: *** '),write(T1),write(' ***'),nl,
+	count_piece(Board,R1,R2),write('Player a has '),write(R1),write(' pieces.'),nl,write('Player b has '),write(R2),write(' pieces.'),nl.%!
+
+
+
+play(Board,T,N):- 1 is (N mod 2),nl,print_board(Board),nl,
+	write('***** Player '),write(T),write(' *****'),nl,
+	write('You should move one piece to any available position this is flaying part '),nl,
+	write('Enter the number of row to the piece: '),nl,read(X1),
+	write('Enter the number of column to the piece: '),nl,read(Y1),
+	write('Enter the number of row to the position: '),nl,read(X2),
+	write('Enter the number of column to the position: '),nl,read(Y2),
+	check_add_piece(Board,X2,Y2),check_move_piece(Board,X1,Y1,T),dim(X2,Y2,Z2),dim(X1,Y1,Z1),%neighbor(Z1,Z2),
+        add_piece(Board,NewBoard,T,Z2),write(' on est la 1 '),nl,remove_piece(NewBoard,NewBoard2,Z1),write(' on est la 2 '), 
+        check_triple(NewBoard2,Z2,T,NewBoard3),another_player(T,T1),write(' on est la 3 '),
+        write('the player moved the piece from '),write('('),write(X1),write(','),write(Y1),write(') '),write(' to '),write('('),
+        write(X2),write(','),write(Y2),write(')'),nl,N1 is N+1,play(NewBoard3,T1,N1),write(' till the end '),nl.
+
+play(Board,T,N):- 1 is (N mod 2),write( ' pas de chance part3 '),write(' Incorrect, this move is not available '),nl,play(Board,T,N).
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%Computer turn
+
+play(Board,T,N):- 0 is (N mod 2),write('before h part 3 of the game '),nl,h11(Board,NewBoard,T),write(' after h part 3'),another_player(T,T1),
+                  N1 is N+1,play(NewBoard,T1,N1),write(' add triple heuristic  was applied part3 '),nl,!.
+play(Board,T,N):- 0 is (N mod 2),write('before h part 3 '),nl,h12(Board,NewBoard,T),write(' after h  part3 '),another_player(T,T1),N1 is N+1,
+                  play(NewBoard,T1,N1),write(' prevent triple heuristic was applied part 3 '),nl,!.
+play(Board,T,N):- 0 is (N mod 2),write('before h part3 '),nl,h13(Board,NewBoard,T),write(' after h part 3 '),another_player(T,T1),N1 is N+1,
+                  play(NewBoard,T1,N1),write(' remove triple heuristic was applied part 3'),nl,!.
+play(Board,T,N):- 0 is (N mod 2),write('before h part 3'),h14(Board,NewBoard,T),write(' after h part3 '),another_player(T,T1),
+                  N1 is N+1,play(NewBoard,T1,N1),write(' prevent the other to remove triple heuristic was applied part 3 '),nl,!.
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+
+
+
+
+
+new_game:- play(['e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e'],'a',1). %%init the board
