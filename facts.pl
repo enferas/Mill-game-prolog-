@@ -474,6 +474,7 @@ h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,21,T1),re
 h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,22,T1),remove_piece(Board,NewBoard,22),computer_print_delet(22).
 h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,24,T1),remove_piece(Board,NewBoard,24),computer_print_delet(24).
 
+
 %apply priority to delete one piece
 computer_delete_piece(Board,T,NewBoard):- h7(Board,NewBoard,T).
 computer_delete_piece(Board,T,NewBoard):- h8(Board,NewBoard,T).
@@ -495,7 +496,7 @@ h3(Board,NewBoard,T):- neighbor(X,Y),neighbor(Y,Z),X\=Z,\+ all_permutations(X,Y,
 	add_piece(Board,NewBoard1,T,Z),computer_print_add(Z),computer_check_triple(NewBoard1,Z,T,NewBoard).
 
 %this herstic is not final should be changed to be more intelligent
-h4(Board,NewBoard,T):- available_position(Board,5),add_piece(Board,NewBoard1,T,5),computer_check_triple(NewBoard1,5,T,NewBoard),computer_print_add(5).
+/*h4(Board,NewBoard,T):- available_position(Board,5),add_piece(Board,NewBoard1,T,5),computer_check_triple(NewBoard1,5,T,NewBoard),computer_print_add(5).
 h4(Board,NewBoard,T):- available_position(Board,11),add_piece(Board,NewBoard1,T,11),computer_check_triple(NewBoard1,11,T,NewBoard),computer_print_add(11).
 h4(Board,NewBoard,T):- available_position(Board,14),add_piece(Board,NewBoard1,T,14),computer_check_triple(NewBoard1,14,T,NewBoard),computer_print_add(14).
 h4(Board,NewBoard,T):- available_position(Board,20),add_piece(Board,NewBoard1,T,20),computer_check_triple(NewBoard1,20,T,NewBoard),computer_print_add(20).
@@ -518,15 +519,52 @@ h4(Board,NewBoard,T):- available_position(Board,18),add_piece(Board,NewBoard1,T,
 h4(Board,NewBoard,T):- available_position(Board,19),add_piece(Board,NewBoard1,T,19),computer_check_triple(NewBoard1,19,T,NewBoard),computer_print_add(19).
 h4(Board,NewBoard,T):- available_position(Board,21),add_piece(Board,NewBoard1,T,21),computer_check_triple(NewBoard1,21,T,NewBoard),computer_print_add(21).
 h4(Board,NewBoard,T):- available_position(Board,22),add_piece(Board,NewBoard1,T,22),computer_check_triple(NewBoard1,22,T,NewBoard),computer_print_add(22).
-h4(Board,NewBoard,T):- available_position(Board,24),add_piece(Board,NewBoard1,T,24),computer_check_triple(NewBoard1,24,T,NewBoard),computer_print_add(24).
+h4(Board,NewBoard,T):- available_position(Board,24),add_piece(Board,NewBoard1,T,24),computer_check_triple(NewBoard1,24,T,NewBoard),computer_print_add(24).*/
 
+computer_add_piece(Board,NewBoard,Idx,T):- available_position(Board,Idx),
+						add_piece(Board,NewBoard1,T,Idx), 
+						computer_check_triple(NewBoard1,Idx,T,NewBoard).
 
+%Compute heuristics
+compute_H(Board,R):- count_piece(Board,E,Q), R is Q - E.
+
+max(R1,R2,R1,NIdx,OIdx,NIdx):-R1>R2.
+max(R1,R2,R2,OIdx,OIdx,NIdx).
+
+min(R1,R2,R1,NIdx,OIdx,NIdx):-R1<R2.
+min(R1,R2,R2,OIdx,OIdx,NIdx).
+
+min_max(Level,R1,R2,R,RIdx,OIdx,NIdx):- 0 is mod(Level,2),max(R1,R2,R,RIdx,OIdx,NIdx),!.
+min_max(Level,R1,R2,R,RIdx,OIdx,NIdx):- min(R1,R2,R,RIdx,OIdx,NIdx).
+
+defult_value(Level,50):- 0 is mod(Level,2).
+defult_value(_,-50).
+
+pruning(Board,Level,T,Idx1,R,Beta2,-50,Son,RIdx,TIdx):- alpha_beta(Board,Level,T,Idx1,R,Beta2,-50,Son,RIdx,TIdx).
+pruning(Board,Level,T,Idx1,R,Beta2,50,Son,RIdx,TIdx):- alpha_beta(Board,Level,T,Idx1,R,Beta2,50,Son,RIdx,TIdx).
+pruning(Board,Level,T,Idx1,R,Beta2,Father,Son,RIdx,TIdx):- 0 is mod(Level,2),Father<Beta2,alpha_beta(Board,Level,T,Idx1,R,Beta2,Father,Son,RIdx,TIdx).
+pruning(Board,Level,T,Idx1,R,Beta2,Father,Son,RIdx,TIdx):- 1 is mod(Level,2),Father>Beta2,alpha_beta(Board,Level,T,Idx1,R,Beta2,Father,Son,RIdx,TIdx).
+pruning(Board,Level,T,Idx1,Beta2,Beta2,Father,Son,RIdx,TIdx).
+
+alpha_beta(_,_,_,25,R,R,_,_,RIdx,RIdx).
+alpha_beta(Board,6,T,_,R,_,_,_,RIdx,RIdx):- compute_H(Board,R)/*,write(R),nl,write(T),write(': '),write(Board),nl*/.
+alpha_beta(Board,Level,T,Idx,R,Beta,Father,Son,RIdx,TIdx):- \+ available_position(Board,Idx),
+							Idx1 is Idx+1,
+							alpha_beta(Board,Level,T,Idx1,R,Beta,Father,Son,RIdx,TIdx).
+alpha_beta(Board,Level,T,Idx,R,Beta,Father,Son,RIdx,TIdx):- Nextlevel is Level + 1,		
+					Idx1 is Idx+1,
+					another_player(T,T1),
+					defult_value(Nextlevel,Beta1),
+					computer_add_piece(Board,NewBoard,Idx,T),
+					alpha_beta(NewBoard,Nextlevel,T1,1,Alpha1,Beta1,Son,Beta1,RIdx1,Idx),
+					min_max(Nextlevel,Alpha1,Beta,Beta2,RIdx2,TIdx,Idx),
+					pruning(Board,Level,T,Idx1,R,Beta2,Father,Beta2,RIdx,RIdx2).
+h4(Board,NewBoard,T):- 	alpha_beta(Board,1,T,1,R,-50,50,50,RIdx,-50),write(RIdx),nl,computer_add_piece(Board,NewBoard,RIdx,T),write(RIdx),nl,computer_print_add(RIdx).				
 
 h5(Board,NewBoard,T):- another_player(T,T1),all_permutations(X,Y,Z),available_position(Board,Z),position_has_Tpiece(Board,X,T1),
 	position_has_Tpiece(Board,Y,T1),add_piece(Board,NewBoard1,T,Z),computer_print_add(Z),computer_check_triple(NewBoard1,Z,T,NewBoard).
-
 h6(Board,NewBoard,T):- another_player(T,T1),select_positions(X,Y),select_positions(Y,Z),X\=Z,\+ all_permutations(X,Y,Z),available_position(Board,Y),position_has_Tpiece(Board,X,T1),
-	position_has_Tpiece(Board,Z,T1),add_piece(Board,NewBoard1,T,Y),computer_print_add(Y),computer_check_triple(NewBoard1,Y,T,NewBoard).
+	another_player(T,T1), position_has_Tpiece(Board,Z,T1), add_piece(Board,NewBoard1,T,Y),computer_print_add(Y),computer_check_triple(NewBoard1,Y,T,NewBoard).
 
 h11(Board,NewBoard,T):- all_permutations(X,Y,Z),
 neighbor(Z,Z1),
@@ -596,11 +634,11 @@ play(Board,T,N):- 1 is (N mod 2),N<19,write('Incorrect, this position is not ava
 %************************************************************************************
 %The Computer turn
 
-play(Board,T,N):-  0 is (N mod 2),N<19, write('make triple'),nl,h2(Board,NewBoard,T), another_player(T,T1),N1 is N+1,play(NewBoard,T1,N1),!.
+/*play(Board,T,N):-  0 is (N mod 2),N<19, write('make triple'),nl,h2(Board,NewBoard,T), another_player(T,T1),N1 is N+1,play(NewBoard,T1,N1),!.
 play(Board,T,N):-  0 is (N mod 2),N<19, write('prevent triple'),nl,h5(Board,NewBoard,T), another_player(T,T1),N1 is N+1,play(NewBoard,T1,N1),!.
 play(Board,T,N):-  0 is (N mod 2),N<19, write('create choice'),nl,h1(Board,NewBoard,T), another_player(T,T1),N1 is N+1,play(NewBoard,T1,N1),!.
 play(Board,T,N):-  0 is (N mod 2),N<19, write('prevent choice'),nl,h6(Board,NewBoard,T), another_player(T,T1),N1 is N+1,play(NewBoard,T1,N1),!.
-play(Board,T,N):-  0 is (N mod 2),N<19, write('create choices'),nl,h3(Board,NewBoard,T), another_player(T,T1),N1 is N+1,play(NewBoard,T1,N1),!.
+play(Board,T,N):-  0 is (N mod 2),N<19, write('create choices'),nl,h3(Board,NewBoard,T), another_player(T,T1),N1 is N+1,play(NewBoard,T1,N1),!.*/
 play(Board,T,N):-  0 is (N mod 2),N<19, write('multi connextion'),nl,h4(Board,NewBoard,T), another_player(T,T1),N1 is N+1,play(NewBoard,T1,N1).
 %************************************************************************************
 %the second part of the game (move the pieces)
@@ -632,3 +670,9 @@ play(Board,T,N):- 0 is (N mod 2),write('prevent the other to remove triple'),h14
 
 
 new_game:- play(['e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e'],'a',1).
+
+pp:- h4(['a','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e'],B,'b').
+
+aa:- computer_add_piece(['a','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e'],NewBoard,1,'b').
+
+
