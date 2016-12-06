@@ -465,15 +465,13 @@ computer_print_add(Z):- dim(A,B,Z)/*,write("The computer add the piece("),write(
 %print the move in the computer turn
 computer_print_move(Z1,Z):- dim(A1,B1,Z1),dim(A,B,Z),write("The computer move the piece from("),write(A1),write(","),write(B1),write(") to ("),write(A),write(","),write(B),write(")"),nl.
 
-h7(Board,NewBoard,T):- another_player(T,T1), select_positions(X,Y),select_positions(Y,Z),X\=Z,\+ all_permutations(X,Y,Z),position_has_Tpiece(Board,Y,T1),position_has_Tpiece(Board,X,T1),
-	all_permutations(X,Y,Z1),available_position(Board,Z1),all_permutations(Y,Z,Z2),available_position(Board,Z2),
-	position_has_Tpiece(Board,Z,T1),remove_piece(Board,NewBoard,Y),computer_print_delet(Y),!.
+h7(Board,NewBoard,T):- two_choices(A,B,C,D,E),position_has_Tpiece(Board,C,T),check_h1(Board,A,B,D,E,T),remove_piece(Board,NewBoard,C),computer_print_delet(C).
 
-h8(Board,NewBoard,T):- another_player(T,T1), all_permutations(X,Y,Z), available_position(Board,Z),position_has_Tpiece(Board,X,T1),position_has_Tpiece(Board,Y,T1),\+ triple(Board,X,T1),remove_piece(Board,NewBoard,X).
+h8(Board,NewBoard,T):- all_permutations(X,Y,Z), available_position(Board,Z),position_has_Tpiece(Board,X,T),position_has_Tpiece(Board,Y,T),\+ triple(Board,X,T1),remove_piece(Board,NewBoard,X),computer_print_delet(C).
 
-h9(Board,NewBoard,T):- another_player(T,T1), select_positions(X,Y),select_positions(Y,Z),X\=Z,\+ all_permutations(X,Y,Z),position_has_Tpiece(Board,Y,T1),position_has_Tpiece(Board,X,T1),
+/*h9(Board,NewBoard,T):- another_player(T,T1), select_positions(X,Y),select_positions(Y,Z),X\=Z,\+ all_permutations(X,Y,Z),position_has_Tpiece(Board,Y,T1),position_has_Tpiece(Board,X,T1),
 	all_permutations(X,Y,Z1),available_position(Board,Z1),all_permutations(Y,Z,Z2),available_position(Board,Z2),
-	available_position(Board,Z2),remove_piece(Board,NewBoard,X),computer_print_delet(X),!.
+	available_position(Board,Z2),remove_piece(Board,NewBoard,X),computer_print_delet(X),!.*/
 
 %this herstic is not final should be changed to be more intelligent
 h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,5,T1),remove_piece(Board,NewBoard,5),computer_print_delet(5).
@@ -501,12 +499,16 @@ h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,21,T1),re
 h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,22,T1),remove_piece(Board,NewBoard,22),computer_print_delet(22).
 h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,24,T1),remove_piece(Board,NewBoard,24),computer_print_delet(24).
 
+/*h10(Board,NewBoard,T,25,R,RIdx).
+h10(Board,NewBoard,T,Idx,R,RIdx):- position_has_Tpiece(Board,Idx,T),remove_piece(Board,NewBoard1,Idx),h10(Board,,*/
+
+delete_rules(Board,NewBoard,T):- h8(Board,NewBoard,T).
+delete_rules(Board,NewBoard,T):- h7(Board,NewBoard,T).
+delete_rules(Board,NewBoard,T):- h10(Board,NewBoard,T,1).
+
 
 %apply priority to delete one piece
-computer_delete_piece(Board,T,NewBoard):- h7(Board,NewBoard,T).
-computer_delete_piece(Board,T,NewBoard):- h8(Board,NewBoard,T).
-computer_delete_piece(Board,T,NewBoard):- h9(Board,NewBoard,T).
-computer_delete_piece(Board,T,NewBoard):- h10(Board,NewBoard,T).
+computer_delete_piece(Board,T,NewBoard):- another_player(T,T1),delete_rules(Board,NewBoard,T1).
 
 %check if the computer has triple
 computer_check_triple(Board,X,T,NewBoard):- triple(Board,X,T),computer_delete_piece(Board,T,NewBoard).
@@ -531,6 +533,49 @@ h6(Board,NewBoard,T,Y):- another_player(T,T1),h1(Board,NewBoard,T1,Y).
 computer_add_piece(Board,NewBoard,Idx,T):- available_position(Board,Idx),
 						add_piece(Board,NewBoard1,T,Idx), 
 						computer_check_triple(NewBoard1,Idx,T,NewBoard).
+%check if Idx one of the four places
+check_Idx(Board,Idx,B,D,E,Idx,T):-available_position(Board,Idx),available_position(Board,B),available_position(Board,E),position_has_Tpiece(Board,D,T).
+check_Idx(Board,Idx,B,D,E,Idx,T):-available_position(Board,Idx),available_position(Board,B),available_position(Board,D),position_has_Tpiece(Board,E,T).
+check_Idx(Board,A,Idx,D,E,Idx,T):-available_position(Board,A),available_position(Board,Idx),available_position(Board,E),position_has_Tpiece(Board,D,T).
+check_Idx(Board,A,Idx,D,E,Idx,T):-available_position(Board,A),available_position(Board,Idx),available_position(Board,D),position_has_Tpiece(Board,E,T).
+check_Idx(Board,A,B,Idx,E,Idx,T):-available_position(Board,A),available_position(Board,Idx),available_position(Board,E),position_has_Tpiece(Board,B,T).
+check_Idx(Board,A,B,Idx,E,Idx,T):-available_position(Board,B),available_position(Board,Idx),available_position(Board,E),position_has_Tpiece(Board,A,T).
+check_Idx(Board,A,B,D,Idx,Idx,T):-available_position(Board,B),available_position(Board,D),available_position(Board,Idx),position_has_Tpiece(Board,A,T).
+check_Idx(Board,A,B,D,Idx,Idx,T):-available_position(Board,A),available_position(Board,D),available_position(Board,Idx),position_has_Tpiece(Board,B,T).
+
+%count the posibilities to make two choices with Idx and center C
+search_4(Board,D,E,T):-available_position(Board,E).
+search_3(Board,D,E,T):-position_has_Tpiece(Board,D,T),!,search_4(Board,D,E,T).
+search_3(Board,D,E,T):-available_position(Board,D),position_has_Tpiece(Board,E,T).
+search_2(Board,A,B,D,E,T):-available_position(Board,B),search_3(Board,D,E,T).
+search_1(Board,A,B,D,E,T):-position_has_Tpiece(Board,A,T),!,search_2(Board,A,B,D,E,T).
+search_1(Board,A,B,D,E,T):-available_position(Board,A),position_has_Tpiece(Board,B,T),search_3(Board,D,E,T).
+search_two_choices(Board,T,0,Idx,25).
+search_two_choices(Board,T,N,Idx,C):- available_position(Board,C),two_choices(A,B,C,D,E),check_Idx(Board,A,B,D,E,Idx,T),
+					
+					/*search_1(Board,A,B,D,E,T),*/C1 is C+1,search_two_choices(Board,T,N1,Idx,C1),N is N1+1,
+write(A),write(' '),write(B),write(' '),write(C),write(' '),write(D),write(' '),write(E),nl.
+search_two_choices(Board,T,N,Idx,C):-C1 is C+1,search_two_choices(Board,T,N,Idx,C1).
+
+weight_Board(Board,[],[],T,25).
+weight_Board(Board,[N|Y],[I|IB],T,Idx):- available_position(Board,Idx),
+					search_two_choices(Board,T,N1,Idx,1),
+					/*another_player(T,T1),
+					search_two_choices(Board,T1,N2,Idx,1),*/
+					N is N1 * 3,
+					I is Idx,
+					Idx1 is Idx+1,
+					weight_Board(Board,Y,IB,T,Idx1).
+weight_Board(Board,NewBoard,IBoard,T,Idx):-Idx1 is Idx+1,weight_Board(Board,NewBoard,IBoard,T,Idx1).
+
+%we need to change to quick sort
+%sort the list depending on the weights
+sort([],[],[],[]).
+sort([X],[X],[Y],[Y]).
+sort([A,B|C],[B,A|C],[X,Y|Z],[Y,X|Z]):-A<B.
+sort([A|C],[A|C1],[X|Z],[X|Z1]):-sort(C,C1,Z,Z1).
+sort_24_time(Board,Board,IBoard,IBoard,577).
+sort_24_time(Board,NewBoard,IBoard,NewIBoard,Idx):-Idx1 is Idx+1,sort(Board,NewBoard1,IBoard,NewIBoard1),sort_24_time(NewBoard1,NewBoard,NewIBoard1,NewIBoard,Idx1).
 
 %Compute heuristics
 compute_H(Board,R):- count_piece(Board,E,Q), R is Q - E.
@@ -734,8 +779,8 @@ play(Board,T,N):- 0 is (N mod 2),write('prevent the other to remove triple'),h14
 
 new_game:- open('file.txt',write, Stream),play(['e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e'],'a',1),close(Stream).
 
-//pp:- h4([a,e,b,e,e,e,e,e,e,a,e,e,e,e,e,e,e,e,e,e,e,e,e,e],B,'b').
-
-//aa:- computer_add_piece(['a','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e'],NewBoard,1,'b').
+%pp:- weight_Board([a,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],NewBoard,IBoard,'a',1),sort_24_time(NewBoard,NB,IBoard,NIB,1),write(NB),nl,write(NIB),nl.
+%kk:- search_1([a,e,e,e,e,e,e,e,e,a,e,e,e,e,e,e,e,e,e,e,e,e,e,e],1,2,15,24,'a'),write('true'),nl.
+%aa:- computer_add_piece(['a','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e'],NewBoard,1,'b').
 
 
