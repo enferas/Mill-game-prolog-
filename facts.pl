@@ -381,6 +381,25 @@ available_position([_|Y],N):- N>0 ,N1 is N-1,available_position(Y,N1).
 position_has_Tpiece([T|_],1,T).
 position_has_Tpiece([_|Y],N,T):- N>0 ,N1 is N-1,position_has_Tpiece(Y,N1,T).
 
+%Get the value R in the index Idx
+get_value([X|_],1,X).
+get_value([_|T],Idx,R):-Idx1 is Idx-1,get_value(T,Idx1,R).
+
+%Get 4 values R1,R2,R3,R4 in the indexs Idx1,Idx2,Idx3,Idx4 in the same time
+get_values([],_,_,_,_,_,_,_,_):-!.
+get_values([AX|T],1,Idx2,Idx3,Idx4,AX,R2,R3,R4):-Idx22 is Idx2-1,Idx33 is Idx3-1,Idx44 is Idx4-1,get_values(T,0,Idx22,Idx33,Idx44,_,R2,R3,R4),!.
+get_values([AX|T],Idx1,1,Idx3,Idx4,R1,AX,R3,R4):-Idx11 is Idx1-1,Idx33 is Idx3-1,Idx44 is Idx4-1,get_values(T,Idx11,0,Idx33,Idx44,R1,_,R3,R4),!.
+get_values([AX|T],Idx1,Idx2,1,Idx4,R1,R2,AX,R4):-Idx11 is Idx1-1,Idx22 is Idx2-1,Idx44 is Idx4-1,get_values(T,Idx11,Idx22,0,Idx44,R1,R2,_,R4),!.
+get_values([AX|T],Idx1,Idx2,Idx3,1,R1,R2,R3,AX):-Idx11 is Idx1-1,Idx22 is Idx2-1,Idx33 is Idx3-1,get_values(T,Idx11,Idx22,Idx33,0,R1,R2,R3,_),!.
+get_values([AX|T],Idx1,Idx2,Idx3,Idx4,R1,R2,R3,R4):-Idx11 is Idx1-1,Idx22 is Idx2-1,Idx33 is Idx3-1,Idx44 is Idx4-1,get_values(T,Idx11,Idx22,Idx33,Idx44,R1,R2,R3,R4).
+
+%Get 3 values R1,R2,R3 in the indexs Idx1,Idx2,Idx3 in the same time
+get_values([],_,_,_,_,_,_):-!.
+get_values([AX|T],1,Idx2,Idx3,AX,R2,R3):-Idx22 is Idx2-1,Idx33 is Idx3-1,get_values(T,0,Idx22,Idx33,_,R2,R3),!.
+get_values([AX|T],Idx1,1,Idx3,R1,AX,R3):-Idx11 is Idx1-1,Idx33 is Idx3-1,get_values(T,Idx11,0,Idx33,R1,_,R3),!.
+get_values([AX|T],Idx1,Idx2,1,R1,R2,AX):-Idx11 is Idx1-1,Idx22 is Idx2-1,get_values(T,Idx11,Idx22,0,R1,R2,_),!.
+get_values([AX|T],Idx1,Idx2,Idx3,R1,R2,R3):-Idx11 is Idx1-1,Idx22 is Idx2-1,Idx33 is Idx3-1,get_values(T,Idx11,Idx22,Idx33,R1,R2,R3).
+
 %check if the move (add piece) is correct or not
 check_add_piece(Board,X,Y):-position(X,Y),dim(X,Y,Z),available_position(Board,Z).
 
@@ -416,19 +435,9 @@ count_piece([a|Y],R,Q):- count_piece(Y,W,Q),R is W + 1.
 count_piece([b|Y],R,Q):- count_piece(Y,R,E),Q is E + 1.
 count_piece([e|Y],R,Q):- count_piece(Y,R,Q).
 
-%this function to generate all permutations to the triple in the same row or column
-all_permutations(X,Y,Z):- row(X,Y,Z).
-all_permutations(X,Y,Z):- row(X,Z,Y).
-all_permutations(X,Y,Z):- row(Y,X,Z).
-all_permutations(X,Y,Z):- row(Y,Z,X).
-all_permutations(X,Y,Z):- row(Z,X,Y).
-all_permutations(X,Y,Z):- row(Z,Y,X).
-all_permutations(X,Y,Z):- column(X,Y,Z).
-all_permutations(X,Y,Z):- column(X,Z,Y).
-all_permutations(X,Y,Z):- column(Y,X,Z).
-all_permutations(X,Y,Z):- column(Y,Z,X).
-all_permutations(X,Y,Z):- column(Z,X,Y).
-all_permutations(X,Y,Z):- column(Z,Y,X).
+%this function to generate all posibilities of the triple in the same row or column
+rows_columns(X,Y,Z):-row(X,Y,Z).
+rows_columns(X,Y,Z):-column(X,Y,Z).
 
 %select two positions in the same row or column
 select_positions(X,Y):-neighbor(X,Y).
@@ -457,54 +466,74 @@ select_positions(X,Y):-column(X,_,Y).
 %************************************************************************************
 
 %print the delete in the computer turn
-computer_print_delet(Z):- dim(A,B,Z)/*,write("The computer delete the piece("),write(A),write(","),write(B),write(")."),nl*/.
+computer_print_delet(Z):- dim(A,B,Z),write("The computer delete the piece("),write(A),write(","),write(B),write(")."),nl.
 
 %print the add in the computer turn
-computer_print_add(Z):- dim(A,B,Z)/*,write("The computer add the piece("),write(A),write(","),write(B),write(")."),nl*/.
+computer_print_add(Z):- dim(A,B,Z),write("The computer add the piece("),write(A),write(","),write(B),write(")."),nl.
 
 %print the move in the computer turn
 computer_print_move(Z1,Z):- dim(A1,B1,Z1),dim(A,B,Z),write("The computer move the piece from("),write(A1),write(","),write(B1),write(") to ("),write(A),write(","),write(B),write(")"),nl.
 
-h7(Board,NewBoard,T):- two_choices(A,B,C,D,E),position_has_Tpiece(Board,C,T),check_h1(Board,A,B,D,E,T),remove_piece(Board,NewBoard,C),computer_print_delet(C).
+h7(Board,NewBoard,T):- two_choices(A,B,C,D,E),
+				position_has_Tpiece(Board,C,T),
+				get_values(Board,A,B,D,E,RA,RB,RD,RE),
+				check_h1(RA,RB,RD,RE,T),
+				remove_piece(Board,NewBoard,C).
 
-h8(Board,NewBoard,T):- all_permutations(X,Y,Z), available_position(Board,Z),position_has_Tpiece(Board,X,T),position_has_Tpiece(Board,Y,T),\+ triple(Board,X,T1),remove_piece(Board,NewBoard,X),computer_print_delet(C).
+check_h8(_,Y,Z,e,T,T,Y,Z,T).
+check_h8(X,_,Z,T,e,T,X,Z,T).
+check_h8(X,Y,_,T,T,e,X,Y,T).
 
-/*h9(Board,NewBoard,T):- another_player(T,T1), select_positions(X,Y),select_positions(Y,Z),X\=Z,\+ all_permutations(X,Y,Z),position_has_Tpiece(Board,Y,T1),position_has_Tpiece(Board,X,T1),
-	all_permutations(X,Y,Z1),available_position(Board,Z1),all_permutations(Y,Z,Z2),available_position(Board,Z2),
-	available_position(Board,Z2),remove_piece(Board,NewBoard,X),computer_print_delet(X),!.*/
+delete_one_from_two(Board,NewBoard,X,_,T):- \+ triple(Board,X,T),!,remove_piece(Board,NewBoard,X).
+delete_one_from_two(Board,NewBoard,_,Y,T):- \+ triple(Board,Y,T),remove_piece(Board,NewBoard,Y).
+
+h8(Board,NewBoard,T):- another_player(T,T1),
+			rows_columns(X,Y,Z),
+			get_values(Board,X,Y,Z,RX,RY,RZ),
+			check_h8(X,Y,Z,RX,RY,RZ,RR1,RR2,T1),
+			delete_one_from_two(Board,NewBoard,RR1,RR2,T1).
 
 %this herstic is not final should be changed to be more intelligent
-h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,5,T1),remove_piece(Board,NewBoard,5),computer_print_delet(5).
-h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,11,T1),remove_piece(Board,NewBoard,11),computer_print_delet(11).
-h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,14,T1),remove_piece(Board,NewBoard,14),computer_print_delet(14).
-h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,20,T1),remove_piece(Board,NewBoard,20),computer_print_delet(20).
-h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,2,T1),remove_piece(Board,NewBoard,2),computer_print_delet(2).
-h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,8,T1),remove_piece(Board,NewBoard,8),computer_print_delet(8).
-h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,10,T1),remove_piece(Board,NewBoard,10),computer_print_delet(10).
-h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,12,T1),remove_piece(Board,NewBoard,12),computer_print_delet(12).
-h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,13,T1),remove_piece(Board,NewBoard,13),computer_print_delet(13).
-h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,15,T1),remove_piece(Board,NewBoard,15),computer_print_delet(15).
-h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,17,T1),remove_piece(Board,NewBoard,17),computer_print_delet(17).
-h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,23,T1),remove_piece(Board,NewBoard,23),computer_print_delet(23).
-h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,1,T1),remove_piece(Board,NewBoard,1),computer_print_delet(1).
-h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,3,T1),remove_piece(Board,NewBoard,3),computer_print_delet(3).
-h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,4,T1),remove_piece(Board,NewBoard,4),computer_print_delet(4).
-h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,6,T1),remove_piece(Board,NewBoard,6),computer_print_delet(6).
-h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,7,T1),remove_piece(Board,NewBoard,7),computer_print_delet(7).
-h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,9,T1),remove_piece(Board,NewBoard,9),computer_print_delet(9).
-h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,16,T1),remove_piece(Board,NewBoard,16),computer_print_delet(16).
-h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,18,T1),remove_piece(Board,NewBoard,18),computer_print_delet(18).
-h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,19,T1),remove_piece(Board,NewBoard,19),computer_print_delet(19).
-h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,21,T1),remove_piece(Board,NewBoard,21),computer_print_delet(21).
-h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,22,T1),remove_piece(Board,NewBoard,22),computer_print_delet(22).
-h10(Board,NewBoard,T):- another_player(T,T1),position_has_Tpiece(Board,24,T1),remove_piece(Board,NewBoard,24),computer_print_delet(24).
+h10(Board,NewBoard,T):- position_has_Tpiece(Board,5,T),remove_piece(Board,NewBoard,5).
+h10(Board,NewBoard,T):- position_has_Tpiece(Board,11,T),remove_piece(Board,NewBoard,11).
+h10(Board,NewBoard,T):- position_has_Tpiece(Board,14,T),remove_piece(Board,NewBoard,14).
+h10(Board,NewBoard,T):- position_has_Tpiece(Board,20,T),remove_piece(Board,NewBoard,20).
+h10(Board,NewBoard,T):- position_has_Tpiece(Board,2,T),remove_piece(Board,NewBoard,2).
+h10(Board,NewBoard,T):- position_has_Tpiece(Board,8,T),remove_piece(Board,NewBoard,8).
+h10(Board,NewBoard,T):- position_has_Tpiece(Board,10,T),remove_piece(Board,NewBoard,10).
+h10(Board,NewBoard,T):- position_has_Tpiece(Board,12,T),remove_piece(Board,NewBoard,12).
+h10(Board,NewBoard,T):- position_has_Tpiece(Board,13,T),remove_piece(Board,NewBoard,13).
+h10(Board,NewBoard,T):- position_has_Tpiece(Board,15,T),remove_piece(Board,NewBoard,15).
+h10(Board,NewBoard,T):- position_has_Tpiece(Board,17,T),remove_piece(Board,NewBoard,17).
+h10(Board,NewBoard,T):- position_has_Tpiece(Board,23,T),remove_piece(Board,NewBoard,23).
+h10(Board,NewBoard,T):- position_has_Tpiece(Board,1,T),remove_piece(Board,NewBoard,1).
+h10(Board,NewBoard,T):- position_has_Tpiece(Board,3,T),remove_piece(Board,NewBoard,3).
+h10(Board,NewBoard,T):- position_has_Tpiece(Board,4,T),remove_piece(Board,NewBoard,4).
+h10(Board,NewBoard,T):- position_has_Tpiece(Board,6,T),remove_piece(Board,NewBoard,6).
+h10(Board,NewBoard,T):- position_has_Tpiece(Board,7,T),remove_piece(Board,NewBoard,7).
+h10(Board,NewBoard,T):- position_has_Tpiece(Board,9,T),remove_piece(Board,NewBoard,9).
+h10(Board,NewBoard,T):- position_has_Tpiece(Board,16,T),remove_piece(Board,NewBoard,16).
+h10(Board,NewBoard,T):- position_has_Tpiece(Board,18,T),remove_piece(Board,NewBoard,18).
+h10(Board,NewBoard,T):- position_has_Tpiece(Board,19,T),remove_piece(Board,NewBoard,19).
+h10(Board,NewBoard,T):- position_has_Tpiece(Board,21,T),remove_piece(Board,NewBoard,21).
+h10(Board,NewBoard,T):- position_has_Tpiece(Board,22,T),remove_piece(Board,NewBoard,22).
+h10(Board,NewBoard,T):- position_has_Tpiece(Board,24,T),remove_piece(Board,NewBoard,24).
 
-/*h10(Board,NewBoard,T,25,R,RIdx).
-h10(Board,NewBoard,T,Idx,R,RIdx):- position_has_Tpiece(Board,Idx,T),remove_piece(Board,NewBoard1,Idx),h10(Board,,*/
+/*h10(Board,T,25,R,R,RIdx,RIdx).
+h10(Board,T,Idx,R,L,RIdx,LIdx):- position_has_Tpiece(Board,Idx,T),
+					remove_piece(Board,NewBoard1,Idx),write('*** delete ***'),nl,
+					weight_Board(NewBoard1,WeightBoard,IBoard,T,1),
+					sort_24_time(WeightBoard,SortWeightBoard,IBoard,SortIBoard,1), 	
+					rules(Board,NewBoard1,SortIBoard,1,T,R1,50,50,50,RIdx,50),
+					min(R1,L,R2,RIdx2,LIdx,Idx),
+					Idx1 is Idx+1,
+					h10(Board,T,Idx1,R,R2,RIdx,RIdx2).
+h10(Board,T,Idx,R,L,RIdx,Lidx):- Idx1 is Idx+1,h10(Board,T,Idx1,R,L,RIdx,LIdx).*/
 
 delete_rules(Board,NewBoard,T):- h8(Board,NewBoard,T).
 delete_rules(Board,NewBoard,T):- h7(Board,NewBoard,T).
-delete_rules(Board,NewBoard,T):- h10(Board,NewBoard,T,1).
+delete_rules(Board,NewBoard,T):- h10(Board,NewBoard,T).
+%delete_rules(Board,NewBoard,T):- h10(Board,T,1,R,50,Idx,50),remove_piece(Board,NewBoard,Idx).
 
 
 %apply priority to delete one piece
@@ -514,165 +543,161 @@ computer_delete_piece(Board,T,NewBoard):- another_player(T,T1),delete_rules(Boar
 computer_check_triple(Board,X,T,NewBoard):- triple(Board,X,T),computer_delete_piece(Board,T,NewBoard).
 computer_check_triple(L,_,_,L).
 
-check_h1_1(Board,_,_,D,E,T):-available_position(Board,D),position_has_Tpiece(Board,E,T).
-check_h1_1(Board,_,_,D,E,T):-available_position(Board,E),position_has_Tpiece(Board,D,T).
-check_h1(Board,A,B,D,E,T):-available_position(Board,A),position_has_Tpiece(Board,B,T),check_h1_1(Board,A,B,D,E,T).
-check_h1(Board,A,B,D,E,T):-available_position(Board,B),position_has_Tpiece(Board,A,T),check_h1_1(Board,A,B,D,E,T).
+check_h1(T,e,T,e,T).
+check_h1(e,T,T,e,T).
+check_h1(T,e,e,T,T).
+check_h1(e,T,e,T,T).
 
-h1(Board,NewBoard,T,C):- two_choices(A,B,C,D,E),available_position(Board,C),check_h1(Board,A,B,D,E,T),add_piece(Board,NewBoard,T,C).
+h1(Board,NewBoard,T,C):- two_choices(A,B,C,D,E),
+				available_position(Board,C),
+				get_values(Board,A,B,D,E,RA,RB,RD,RE),
+				check_h1(RA,RB,RD,RE,T),
+				add_piece(Board,NewBoard,T,C).
 
-h2(Board,NewBoard,T,Z):- all_permutations(X,Y,Z),available_position(Board,Z),position_has_Tpiece(Board,X,T),position_has_Tpiece(Board,Y,T),add_piece(Board,NewBoard1,T,Z),computer_print_add(Z),computer_check_triple(NewBoard1,Z,T,NewBoard).
+check_h2(X,_,_,e,T,T,X,T).
+check_h2(_,Y,_,T,e,T,Y,T).
+check_h2(_,_,Z,T,T,e,Z,T).
 
-h5(Board,NewBoard,T,Y):- another_player(T,T1),h2(Board,NewBoard,T1,Y).
-h6(Board,NewBoard,T,Y):- another_player(T,T1),h1(Board,NewBoard,T1,Y).
+h2(Board,NewBoard,T,RR):- rows_columns(X,Y,Z),
+				get_values(Board,X,Y,Z,RX,RY,RZ),
+				check_h2(X,Y,Z,RX,RY,RZ,RR,T),
+				add_piece(Board,NewBoard1,T,RR),
+				computer_delete_piece(NewBoard1,T,NewBoard).
 
-/*h3(Board,NewBoard,T,Z):- neighbor(X,Y),neighbor(Y,Z),X\=Z,\+ all_permutations(X,Y,Z),position_has_Tpiece(Board,X,T),available_position(Board,Z),available_position(Board,Y),
-	all_permutations(X,Y,Z1),available_position(Board,Z1),all_permutations(Y,Z,Z2),available_position(Board,Z2),
-	add_piece(Board,NewBoard1,T,Z),computer_print_add(Z),computer_check_triple(NewBoard1,Z,T,NewBoard).*/
+h5(Board,NewBoard,T,RR):- another_player(T,T1),
+				rows_columns(X,Y,Z),
+				get_values(Board,X,Y,Z,RX,RY,RZ),
+				check_h2(X,Y,Z,RX,RY,RZ,RR,T1),
+				add_piece(Board,NewBoard,T,RR).
 
-computer_add_piece(Board,NewBoard,Idx,T):- available_position(Board,Idx),
-						add_piece(Board,NewBoard1,T,Idx), 
-						computer_check_triple(NewBoard1,Idx,T,NewBoard).
+h6(Board,NewBoard,T,C):- another_player(T,T1),
+				two_choices(A,B,C,D,E),
+				available_position(Board,C),
+				get_values(Board,A,B,D,E,RA,RB,RD,RE),
+				check_h1(RA,RB,RD,RE,T1),
+				add_piece(Board,NewBoard,T,C).
+
 %check if Idx one of the four places
-check_Idx(Board,Idx,B,D,E,Idx,T):-available_position(Board,Idx),available_position(Board,B),available_position(Board,E),position_has_Tpiece(Board,D,T).
-check_Idx(Board,Idx,B,D,E,Idx,T):-available_position(Board,Idx),available_position(Board,B),available_position(Board,D),position_has_Tpiece(Board,E,T).
-check_Idx(Board,A,Idx,D,E,Idx,T):-available_position(Board,A),available_position(Board,Idx),available_position(Board,E),position_has_Tpiece(Board,D,T).
-check_Idx(Board,A,Idx,D,E,Idx,T):-available_position(Board,A),available_position(Board,Idx),available_position(Board,D),position_has_Tpiece(Board,E,T).
-check_Idx(Board,A,B,Idx,E,Idx,T):-available_position(Board,A),available_position(Board,Idx),available_position(Board,E),position_has_Tpiece(Board,B,T).
-check_Idx(Board,A,B,Idx,E,Idx,T):-available_position(Board,B),available_position(Board,Idx),available_position(Board,E),position_has_Tpiece(Board,A,T).
-check_Idx(Board,A,B,D,Idx,Idx,T):-available_position(Board,B),available_position(Board,D),available_position(Board,Idx),position_has_Tpiece(Board,A,T).
-check_Idx(Board,A,B,D,Idx,Idx,T):-available_position(Board,A),available_position(Board,D),available_position(Board,Idx),position_has_Tpiece(Board,B,T).
+check_Idx(Idx,_,_,_,e,e,e,T,Idx,T).
+check_Idx(Idx,_,_,_,e,e,T,e,Idx,T).
+check_Idx(_,Idx,_,_,e,e,e,T,Idx,T).
+check_Idx(_,Idx,_,_,e,e,T,e,Idx,T).
+check_Idx(_,_,Idx,_,T,e,e,e,Idx,T).
+check_Idx(_,_,Idx,_,e,T,e,e,Idx,T).
+check_Idx(_,_,_,Idx,T,e,e,e,Idx,T).
+check_Idx(_,_,_,Idx,e,T,e,e,Idx,T).
 
 %count the posibilities to make two choices with Idx and center C
-search_4(Board,D,E,T):-available_position(Board,E).
-search_3(Board,D,E,T):-position_has_Tpiece(Board,D,T),!,search_4(Board,D,E,T).
-search_3(Board,D,E,T):-available_position(Board,D),position_has_Tpiece(Board,E,T).
-search_2(Board,A,B,D,E,T):-available_position(Board,B),search_3(Board,D,E,T).
-search_1(Board,A,B,D,E,T):-position_has_Tpiece(Board,A,T),!,search_2(Board,A,B,D,E,T).
-search_1(Board,A,B,D,E,T):-available_position(Board,A),position_has_Tpiece(Board,B,T),search_3(Board,D,E,T).
-search_two_choices(Board,T,0,Idx,25).
-search_two_choices(Board,T,N,Idx,C):- available_position(Board,C),two_choices(A,B,C,D,E),check_Idx(Board,A,B,D,E,Idx,T),
-					
-					/*search_1(Board,A,B,D,E,T),*/C1 is C+1,search_two_choices(Board,T,N1,Idx,C1),N is N1+1,
-write(A),write(' '),write(B),write(' '),write(C),write(' '),write(D),write(' '),write(E),nl.
+search_two_choices(_,_,0,_,25).
+search_two_choices(Board,T,N,Idx,C):- available_position(Board,C),
+					two_choices(A,B,C,D,E),
+					get_values(Board,A,B,D,E,RA,RB,RD,RE),
+					check_Idx(A,B,D,E,RA,RB,RD,RE,Idx,T),
+					/*write(A),write(' '),write(B),write(' '),write(C),write(' '),write(D),write(' '),write(E),nl,
+					write(RA),write(' '),write(RB),write(' '),write(0),write(' '),write(RD),write(' '),write(RE),nl,*/
+					C1 is C+1,
+					search_two_choices(Board,T,N1,Idx,C1),
+					N is N1+1.
 search_two_choices(Board,T,N,Idx,C):-C1 is C+1,search_two_choices(Board,T,N,Idx,C1).
 
-weight_Board(Board,[],[],T,25).
+
+%weight_Board(_,[],[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],_,_).
+weight_Board(_,[],[],_,25).
 weight_Board(Board,[N|Y],[I|IB],T,Idx):- available_position(Board,Idx),
+					%findall([A,B,C,D],two_choices(A,B,0,C,D),List1),length(List1,R1),
+					%findall(C,two_choices(0,Idx,0,0,T),List1),length(List1,R1),
 					search_two_choices(Board,T,N1,Idx,1),
 					/*another_player(T,T1),
 					search_two_choices(Board,T1,N2,Idx,1),*/
-					N is N1 * 3,
+					N is  3*N1,
 					I is Idx,
 					Idx1 is Idx+1,
 					weight_Board(Board,Y,IB,T,Idx1).
 weight_Board(Board,NewBoard,IBoard,T,Idx):-Idx1 is Idx+1,weight_Board(Board,NewBoard,IBoard,T,Idx1).
 
-%we need to change to quick sort
-%sort the list depending on the weights
-sort([],[],[],[]).
-sort([X],[X],[Y],[Y]).
-sort([A,B|C],[B,A|C],[X,Y|Z],[Y,X|Z]):-A<B.
-sort([A|C],[A|C1],[X|Z],[X|Z1]):-sort(C,C1,Z,Z1).
-sort_24_time(Board,Board,IBoard,IBoard,577).
-sort_24_time(Board,NewBoard,IBoard,NewIBoard,Idx):-Idx1 is Idx+1,sort(Board,NewBoard1,IBoard,NewIBoard1),sort_24_time(NewBoard1,NewBoard,NewIBoard1,NewIBoard,Idx1).
+quicksort([X|Xs],Ys,[IX|IXs],IYs) :-
+  partition(Xs,X,Left,Right,IXs,IX,ILeft,IRight),
+  quicksort(Left,Ls,ILeft,ILs),
+  quicksort(Right,Rs,IRight,IRs),
+  append(Ls,[X|Rs],Ys),
+  append(ILs,[IX|IRs],IYs).
+quicksort([],[],[],[]).
+
+partition([X|Xs],Y,[X|Ls],Rs,[IX|IXs],IY,[IX|ILs],IRs) :-
+  X > Y, partition(Xs,Y,Ls,Rs,IXs,IY,ILs,IRs).
+partition([X|Xs],Y,Ls,[X|Rs],[IX|IXs],IY,ILs,[IX|IRs]) :-
+  X =< Y, partition(Xs,Y,Ls,Rs,IXs,IY,ILs,IRs).
+partition([],Y,[],[],[],IY,[],[]).
+
+append([],Ys,Ys).
+append([X|Xs],Ys,[X|Zs]) :- append(Xs,Ys,Zs).
+
 
 %Compute heuristics
 compute_H(Board,R):- count_piece(Board,E,Q), R is Q - E.
 
-max(R1,R2,R1,NIdx,OIdx,NIdx):-R1>R2.
-max(R1,R2,R2,OIdx,OIdx,NIdx).
+max(R1,R2,R1,NIdx,_,NIdx):-R1>R2.
+max(_,R2,R2,OIdx,OIdx,_).
 
-min(R1,R2,R1,NIdx,OIdx,NIdx):-R1<R2.
-min(R1,R2,R2,OIdx,OIdx,NIdx).
+min(R1,R2,R1,NIdx,_,NIdx):-R1<R2.
+min(_,R2,R2,OIdx,OIdx,_).
 
 min_max(Level,R1,R2,R,RIdx,OIdx,NIdx):- 0 is mod(Level,2),max(R1,R2,R,RIdx,OIdx,NIdx),!.
-min_max(Level,R1,R2,R,RIdx,OIdx,NIdx):- min(R1,R2,R,RIdx,OIdx,NIdx).
+min_max(_,R1,R2,R,RIdx,OIdx,NIdx):- min(R1,R2,R,RIdx,OIdx,NIdx).
 
 defult_value(Level,50):- 0 is mod(Level,2).
 defult_value(_,-50).
 
-pruning(Board,Level,T,Idx1,R,Beta,-50,Son,RIdx,TIdx):- alpha_beta(Board,Level,T,Idx1,R,Beta,-50,Son,RIdx,TIdx).
-pruning(Board,Level,T,Idx1,R,Beta,50,Son,RIdx,TIdx):- alpha_beta(Board,Level,T,Idx1,R,Beta,50,Son,RIdx,TIdx).
-pruning(Board,Level,T,Idx1,R,Beta,Father,Son,RIdx,TIdx):- 0 is mod(Level,2),Father<Beta,alpha_beta(Board,Level,T,Idx1,R,Beta,Father,Son,RIdx,TIdx).
-pruning(Board,Level,T,Idx1,R,Beta,Father,Son,RIdx,TIdx):- 1 is mod(Level,2),Father>Beta,alpha_beta(Board,Level,T,Idx1,R,Beta,Father,Son,RIdx,TIdx).
-pruning(Board,Level,T,Idx1,Beta,Beta,Father,Son,RIdx,TIdx).
+pruning(Board,SortIBoard,Level,T,R,Beta,-50,Son,RIdx,TIdx):- alpha_beta(Board,SortIBoard,Level,T,R,Beta,-50,Son,RIdx,TIdx).
+pruning(Board,SortIBoard,Level,T,R,Beta,50,Son,RIdx,TIdx):- alpha_beta(Board,SortIBoard,Level,T,R,Beta,50,Son,RIdx,TIdx).
+pruning(Board,SortIBoard,Level,T,R,Beta,Father,Son,RIdx,TIdx):- 0 is mod(Level,2),Father<Beta,alpha_beta(Board,SortIBoard,Level,T,R,Beta,Father,Son,RIdx,TIdx).
+pruning(Board,SortIBoard,Level,T,R,Beta,Father,Son,RIdx,TIdx):- 1 is mod(Level,2),Father>Beta,alpha_beta(Board,SortIBoard,Level,T,R,Beta,Father,Son,RIdx,TIdx).
+pruning(_,_,_,_,Beta,Beta,_,_,_,_).
 
-alpha_beta(_,_,_,25,R,R,_,_,RIdx,RIdx).
-alpha_beta(Board,8,T,_,R,_,_,_,RIdx,RIdx):- compute_H(Board,R)/*,write(R),nl,write(T),write(': '),write(Board),nl*/.
-alpha_beta(Board,Level,T,Idx,R,Beta,Father,Son,RIdx,TIdx):- \+ available_position(Board,Idx),
-							Idx1 is Idx+1,
-							alpha_beta(Board,Level,T,Idx1,R,Beta,Father,Son,RIdx,TIdx).
-alpha_beta(Board,Level,T,Idx,R,Beta,Father,Son,RIdx,TIdx):- Nextlevel is Level + 1,		
-					Idx1 is Idx+1,
+alpha_beta(_,[],_,_,R,R,_,_,RIdx,RIdx).
+alpha_beta(Board,_,8,_,R,_,_,_,RIdx,RIdx):- compute_H(Board,R)/*,write(R),write(' '),write(Board),nl*/.
+/*alpha_beta(Board,[Idxs|TailSortIBoard],Level,T,R,Beta,Father,Son,RIdx,TIdx):- \+ available_position(Board,Idxs),
+							alpha_beta(Board,TailSortIBoard,Level,T,R,Beta,Father,Son,RIdx,TIdx).*/
+alpha_beta(Board,[Idxs|TailSortIBoard],Level,T,R,Beta,Father,Son,RIdx,TIdx):- Nextlevel is Level + 1,
 					another_player(T,T1),
 					defult_value(Nextlevel,Beta1),
-					computer_add_piece(Board,NewBoard1,Idx,T),
-					rules(NewBoard1,NewBoard,Nextlevel,T1,1,Alpha1,Beta1,Son,Beta1,RIdx1,Idx),
-					min_max(Nextlevel,Alpha1,Beta,Beta2,RIdx2,TIdx,Idx),
-					pruning(Board,Level,T,Idx1,R,Beta2,Father,Beta2,RIdx,RIdx2).
+					add_piece(Board,NewBoard1,T,Idxs),
+					rules(NewBoard1,[],Nextlevel,T1,Alpha1,Beta1,Son,Beta1,RIdx1,Idxs),
+					min_max(Nextlevel,Alpha1,Beta,Beta2,RIdx2,TIdx,Idxs),
+					pruning(Board,TailSortIBoard,Level,T,R,Beta2,Father,Beta2,RIdx,RIdx2).
 
-h4(Board,NewBoard,T):- 	rules(Board,NewBoard1,1,T,1,R,-50,50,50,RIdx,-50),write('**** '),write(R),nl,computer_add_piece(Board,NewBoard,RIdx,T),write(RIdx),nl,computer_print_add(RIdx).				
+h4(Board,NewBoard,T):- rules(Board,[],1,T,R,-50,50,50,RIdx,-50),
+				add_piece(Board,NewBoard1,T,RIdx), 
+				computer_check_triple(NewBoard1,RIdx,T,NewBoard),
+				write('*** '),write(R),nl,write(RIdx),nl,computer_print_add(RIdx).				
 
-debug(Board,1,R,Idx):-write('Idx('),write(Idx),write(') -'),write('Result('),write(R),write(') -'),write(': '),write(Board),nl.
-debug(_,_,_,_).
-
-debug_aaa(2,24,K):-write('FFFF '),write(K),nl.
-debug_bbb(3,Idx,K):-write('AAAA '),write(Idx),write(' '),write(K),nl.
-debug_aaa(_,_,_).
-debug_bbb(_,_,_).
-
-/*debug_min_max(Level,Idx,-1,Beta,Beta2,RIdx2,TIdx,Idx):-
-								write(Level),write(' '),
-								write(Idx),write('\n').
-debug_min_max(2,Idx,Alpha1,Beta,Beta2,RIdx2,TIdx,Idx):-
-								write('Min-Max: '),write('Level('),write(2),write(') - '),
-								write('Idx('),write(Idx),write(') -'),
-								write('Alpha1('),write(Alpha1),write(') -'),write('\n').*/
-/*debug_min_max(3,Idx,Alpha1,Beta,Beta2,RIdx2,TIdx,Idx):-
-								write('Min-Max: '),write('Level('),write(3),write(') - '),
-								write('Idx('),write(Idx),write(') -'),
-								write('Alpha1('),write(Alpha1),write(') -'),
-								write('Beta('),write(Beta),write(') -'),
-								write('Beta2('),write(Beta2),write(') -'),
-								write('RIdx2('),write(RIdx2),write(') -'),
-								write('TIdx('),write(TIdx),write(') -'),
-								write('Idx('),write(Idx),write(') -'),write('\n').
-debug_min_max(2,Idx,Alpha1,Beta,Beta2,RIdx2,TIdx,Idx):-write('Min-Max: '),write('Level('),write(2),write(') - '),
-								write('Idx('),write(Idx),write(') -'),
-								write('Alpha1('),write(Alpha1),write(') -'),
-								write('Beta('),write(Beta),write(') -'),
-								write('Beta2('),write(Beta2),write(') -'),
-								write('RIdx2('),write(RIdx2),write(') -'),
-								write('TIdx('),write(TIdx),write(') -'),
-								write('Idx('),write(Idx),write(') -'),write('\n').
-debug_min_max(1,Idx,Alpha1,Beta,Beta2,RIdx2,TIdx,Idx):-write('Min-Max: '),write('Level('),write(1),write(') - '),
-								write('Idx('),write(Idx),write(') -'),
-								write('Alpha1('),write(Alpha1),write(') -'),
-								write('Beta('),write(Beta),write(') -'),
-								write('Beta2('),write(Beta2),write(') -'),
-								write('RIdx2('),write(RIdx2),write(') -'),
-								write('TIdx('),write(TIdx),write(') -'),
-								write('Idx('),write(Idx),write(') -'),write('\n').*/
-/*debug_min_max(8,Idx,Alpha1,Beta,Beta2,RIdx2,TIdx,Idx):-write('Min-Max: '),write('Level(3) - '),
-								write('Idx('),write(Idx),write(') -'),
-								write('Alpha1('),write(Alpha1),write(') -'),
-								write('Beta('),write(Beta),write(') -'),
-								write('Beta2('),write(Beta2),write(') -'),
-								write('RIdx2('),write(RIdx2),write(') -'),
-								write('TIdx('),write(TIdx),write(') -'),
-								write('Idx('),write(Idx),write(') -'),nl.*/
-debug_min_max(Level,Idx,Alpha1,Beta,Beta2,RIdx2,TIdx,Idx).
-
-rules(Board,NewBoard,Level,T,Idx,R,Beta,Father,Son,RIdx,TIdx):- Level<8,h2(Board,NewBoard1,T,RIdx),Nextlevel is Level + 1,another_player(T,T1),
-									defult_value(Nextlevel,Beta1),rules(NewBoard1,NewBoard,Nextlevel,T1,1,R,Beta1,Son,Beta1,RIdx1,RIdx).
-rules(Board,NewBoard,Level,T,Idx,R,Beta,Father,Son,RIdx,TIdx):- Level<8,h5(Board,NewBoard1,T,RIdx),Nextlevel is Level + 1,another_player(T,T1),
-									defult_value(Nextlevel,Beta1),rules(NewBoard1,NewBoard,Nextlevel,T1,1,R,Beta1,Son,Beta1,RIdx1,RIdx).
-rules(Board,NewBoard,Level,T,Idx,R,Beta,Father,Son,RIdx,TIdx):- Level<8,h1(Board,NewBoard1,T,RIdx),Nextlevel is Level + 1,another_player(T,T1),
-									defult_value(Nextlevel,Beta1),rules(NewBoard1,NewBoard,Nextlevel,T1,1,R,Beta1,Son,Beta1,RIdx1,RIdx).
-rules(Board,NewBoard,Level,T,Idx,R,Beta,Father,Son,RIdx,TIdx):- Level<8,h6(Board,NewBoard1,T,RIdx),Nextlevel is Level + 1,another_player(T,T1),
-									defult_value(Nextlevel,Beta1),rules(NewBoard1,NewBoard,Nextlevel,T1,1,R,Beta1,Son,Beta1,RIdx1,RIdx).
-rules(Board,NewBoard,Level,T,Idx,R,Beta,Father,Son,RIdx,TIdx):- alpha_beta(Board,Level,T,Idx,R,Beta,Father,Son,RIdx,TIdx).
+rules(Board,_,Level,T,R,Beta,_,Son,RIdx,_):- Level<8,
+						h2(Board,NewBoard1,T,RIdx),
+						Nextlevel is Level + 1,
+						another_player(T,T1),
+						defult_value(Nextlevel,Beta1),
+						rules(NewBoard1,[],Nextlevel,T1,R,Beta1,Son,Beta1,RIdx1,RIdx).
+rules(Board,_,Level,T,R,Beta,_,Son,RIdx,_):- Level<8,
+						h5(Board,NewBoard1,T,RIdx),
+						Nextlevel is Level + 1,
+						another_player(T,T1),
+						defult_value(Nextlevel,Beta1),
+						rules(NewBoard1,[],Nextlevel,T1,R,Beta1,Son,Beta1,RIdx1,RIdx).
+rules(Board,_,Level,T,R,Beta,_,Son,RIdx,_):- Level<8,
+						h1(Board,NewBoard1,T,RIdx),
+						Nextlevel is Level + 1,
+						another_player(T,T1),
+						defult_value(Nextlevel,Beta1),
+						rules(NewBoard1,[],Nextlevel,T1,R,Beta1,Son,Beta1,RIdx1,RIdx).
+rules(Board,_,Level,T,R,Beta,_,Son,RIdx,_):- Level<8,
+						h6(Board,NewBoard1,T,RIdx),
+						Nextlevel is Level + 1,
+						another_player(T,T1), 
+						defult_value(Nextlevel,Beta1),
+						rules(NewBoard1,[],Nextlevel,T1,R,Beta1,Son,Beta1,RIdx1,RIdx).
+rules(Board,SortIBoard,Level,T,R,Beta,Father,Son,RIdx,TIdx):- weight_Board(Board,WeightBoard,IBoard,T,1),
+									quicksort(WeightBoard,SortWeightBoard,IBoard,SortIBoard1),
+									alpha_beta(Board,SortIBoard1,Level,T,R,Beta,Father,Son,RIdx,TIdx).
 
 h11(Board,NewBoard,T):- all_permutations(X,Y,Z),
 neighbor(Z,Z1),
@@ -777,10 +802,17 @@ play(Board,T,N):- 0 is (N mod 2),write('remove triple'),h13(Board,NewBoard,T),an
 play(Board,T,N):- 0 is (N mod 2),write('prevent the other to remove triple'),h14(Board,NewBoard,T),another_player(T,T1),N1 is N+1,play(NewBoard,T1,N1),!.
 
 
-new_game:- open('file.txt',write, Stream),play(['e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e'],'a',1),close(Stream).
+new_game:- play(['e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e'],'a',1).
 
-%pp:- weight_Board([a,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],NewBoard,IBoard,'a',1),sort_24_time(NewBoard,NB,IBoard,NIB,1),write(NB),nl,write(NIB),nl.
+pp:- weight_Board([a,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],NewBoard,IBoard,'a',1),sort_24_time(NewBoard,NB,IBoard,NIB,1),write(NB),nl,write(NIB),nl.
 %kk:- search_1([a,e,e,e,e,e,e,e,e,a,e,e,e,e,e,e,e,e,e,e,e,e,e,e],1,2,15,24,'a'),write('true'),nl.
-%aa:- computer_add_piece(['a','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e'],NewBoard,1,'b').
+aa:- weight_Board(['a','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e'],NewBoard,IBoard,'b',1),
+		write(NewBoard),nl,write(IBoard),nl,
+		quicksort(NewBoard,RNB,IBoard,RIB),
+		write(RNB),nl,write(RIB),nl.
+bb:- get_values([a,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],3,15,22,23,RA,RB,RC,RD),write(RA),write(' '),write(RB),write(' '),write(RC),write(' '),write(RD),nl.
+cc:- search_two_choices(['a','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e'],'a',N,24,1),write(N),nl.
+dd:- h2(['a','a','e','b','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','a'],NewBoard,'a',R),write(NewBoard),nl,write(R),nl.
+
 
 
