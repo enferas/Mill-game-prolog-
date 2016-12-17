@@ -404,28 +404,26 @@ check_h8(X,Y,_,T,T,e,X,Y,T).
 delete_one_from_two(Board,NewBoard,X,_,T):- \+ triple(Board,X,T),!,remove_piece(Board,NewBoard,X).
 delete_one_from_two(Board,NewBoard,_,Y,T):- \+ triple(Board,Y,T),remove_piece(Board,NewBoard,Y).
 
-h8(Board,NewBoard,T):- another_player(T,T1),
-			rows_columns(X,Y,Z),
+h8(Board,NewBoard,T):- rows_columns(X,Y,Z),
 			get_values(Board,X,Y,Z,RX,RY,RZ),
-			check_h8(X,Y,Z,RX,RY,RZ,RR1,RR2,T1),
-			delete_one_from_two(Board,NewBoard,RR1,RR2,T1).
+			check_h8(X,Y,Z,RX,RY,RZ,RR1,RR2,T),
+			delete_one_from_two(Board,NewBoard,RR1,RR2,T).
 
 h9(Board,NewBoard,T):- another_player(T,T1),
 				two_choices(A,B,C,D,E),
-				position_has_Tpiece(Board,C,T1),
+				position_has_Tpiece(Board,C,T),
 				get_values(Board,A,B,D,E,RA,RB,RD,RE),
-				check_h1(RA,RB,RD,RE,T),
+				check_h1(RA,RB,RD,RE,T1),
 				remove_piece(Board,NewBoard,C).
 
 check_h3(X,_,_,T1,T,T,X,T,T1).
 check_h3(_,Y,_,T,T1,T,Y,T,T1).
 check_h3(_,_,Z,T,T,T1,Z,T,T1).
 
-h3(Board,NewBoard,T):- another_player(T,T1),
-				rows_columns(X,Y,Z),
+h3(Board,NewBoard,T):- rows_columns(X,Y,Z),
 				get_values(Board,X,Y,Z,RX,RY,RZ),
-				check_h3(X,Y,Z,RX,RY,RZ,RR,T,T1),
-				\+ triple(Board,RR,T1),
+				check_h3(X,Y,Z,RX,RY,RZ,RR,T,T),
+				\+ triple(Board,RR,T),
 				remove_piece(Board,NewBoard,RR).
 
 %this herstic is not final should be changed to be more intelligent
@@ -611,9 +609,7 @@ pruning(Board,SortIBoard,Level,T,R,Beta,Father,Son,RIdx,TIdx):- 1 is mod(Level,2
 pruning(_,_,_,_,Beta,Beta,_,_,_,_).
 
 alpha_beta(_,[],_,_,R,R,_,_,RIdx,RIdx).
-alpha_beta(Board,_,4,_,R,_,_,_,RIdx,RIdx):- compute_H(Board,R)/*,write(R),write(' '),write(Board),nl*/.
-/*alpha_beta(Board,[Idxs|TailSortIBoard],Level,T,R,Beta,Father,Son,RIdx,TIdx):- \+ available_position(Board,Idxs),
-							alpha_beta(Board,TailSortIBoard,Level,T,R,Beta,Father,Son,RIdx,TIdx).*/
+alpha_beta(Board,_,4,_,R,_,_,_,RIdx,RIdx):- compute_H(Board,R).
 alpha_beta(Board,[Idxs|TailSortIBoard],Level,T,R,Beta,Father,Son,RIdx,TIdx):- Nextlevel is Level + 1,
 					another_player(T,T1),
 					defult_value(Nextlevel,Beta1),
@@ -819,6 +815,8 @@ play(Board,T,N):- 0 is (N mod 2),write('remove triple'),h13(Board,NewBoard,T),an
 
 new_game:- play(['e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e'],'a',1).
 
+
+%just for test and debug
 pp:- weight_Board([a,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],NewBoard,IBoard,'a',1),sort_24_time(NewBoard,NB,IBoard,NIB,1),write(NB),nl,write(NIB),nl.
 %kk:- search_1([a,e,e,e,e,e,e,e,e,a,e,e,e,e,e,e,e,e,e,e,e,e,e,e],1,2,15,24,'a'),write('true'),nl.
 aa:- weight_Board(['a','e','e','b','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e'],NewBoard,IBoard,'b',1),
