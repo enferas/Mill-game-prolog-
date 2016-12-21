@@ -455,7 +455,7 @@ h10(Board,NewBoard,T):- position_has_Tpiece(Board,24,T),remove_piece(Board,NewBo
 h10(Board,T,25,R,R,RIdx,RIdx).
 h10(Board,T,Idx,R,L,RIdx,LIdx):- position_has_Tpiece(Board,Idx,T),
 					remove_piece(Board,NewBoard1,Idx), 	
-					rules(Board,[],1,T,R1,50,50,50,RIdx,50),
+					rules(Board,[],1,T,R1,5000,5000,5000,RIdx,5000),
 					min(R1,L,R2,RIdx2,LIdx,Idx),
 					Idx1 is Idx+1,
 					h10(Board,T,Idx1,R,R2,RIdx,RIdx2).
@@ -466,7 +466,7 @@ delete_rules(Board,NewBoard,T):- h7(Board,NewBoard,T).
 delete_rules(Board,NewBoard,T):- h3(Board,NewBoard,T).
 delete_rules(Board,NewBoard,T):- h9(Board,NewBoard,T).
 delete_rules(Board,NewBoard,T):- h10(Board,NewBoard,T).
-%delete_rules(Board,NewBoard,T):- h10(Board,T,1,R,50,Idx,50),remove_piece(Board,NewBoard,Idx).
+%delete_rules(Board,NewBoard,T):- h10(Board,T,1,R,5000,Idx,5000),remove_piece(Board,NewBoard,Idx).
 
 
 %apply priority to delete one piece
@@ -587,8 +587,21 @@ move_weight_Board(Board,[EB|EBtail],[TB|TBtail],T,Idx):-position_has_Tpiece(Boar
 move_weight_Board(Board,EBoard,TBoard,T,Idx):-Idx1 is Idx+1,
 						move_weight_Board(Board,EBoard,TBoard,T,Idx1).
 
+count_freedom(_,25,_,N,N).
+count_freedom(Board,Idx,T,N,ACC):- position_has_Tpiece(Board,Idx,T),
+				ACC1 is ACC+1, 
+				count_freedom(T,N,ACC).
+
 %Compute heuristics
-compute_H(Board,R):- count_piece(Board,E,Q,0,0), R is Q - E.
+count_triple_posibilites(e,T,T,T).
+count_triple_posibilites(T,e,T,T).
+count_triple_posibilites(T,T,e,T).
+
+compute_H(Board,R,T):- count_piece(Board,E,Q,0,0), R4 is Q - E,
+			findall(A,(rows_columns(A,B,C),get_values(Board,A,B,C,RA,RB,RC),=(RA,T),=(RB,T),=(RC,T)),Rlist2),length(Rlist2,R2),
+			%findall(A1,(neighbor(A1,B1),position_has_Tpiece(Board,A1,T),available_position(Board,B1)),Rlist1),length(Rlist1,R1),
+			findall(A2,(rows_columns(A,B,C),get_values(Board,A,B,C,RA,RB,RC),count_triple_posibilites(RA,RB,RC,T)),Rlist3),length(Rlist3,R3),
+			R is R2*3 + R3 + R4*4.
 
 max(R1,R2,R1,NIdx,_,NIdx):-R1>R2.
 max(_,R2,R2,OIdx,OIdx,_).
@@ -599,17 +612,17 @@ min(_,R2,R2,OIdx,OIdx,_).
 min_max(Level,R1,R2,R,RIdx,OIdx,NIdx):- 0 is mod(Level,2),max(R1,R2,R,RIdx,OIdx,NIdx),!.
 min_max(_,R1,R2,R,RIdx,OIdx,NIdx):- min(R1,R2,R,RIdx,OIdx,NIdx).
 
-defult_value(Level,50):- 0 is mod(Level,2).
-defult_value(_,-50).
+defult_value(Level,5000):- 0 is mod(Level,2).
+defult_value(_,-5000).
 
-pruning(Board,SortIBoard,Level,T,R,Beta,-50,Son,RIdx,TIdx):- alpha_beta(Board,SortIBoard,Level,T,R,Beta,-50,Son,RIdx,TIdx).
-pruning(Board,SortIBoard,Level,T,R,Beta,50,Son,RIdx,TIdx):- alpha_beta(Board,SortIBoard,Level,T,R,Beta,50,Son,RIdx,TIdx).
+pruning(Board,SortIBoard,Level,T,R,Beta,-5000,Son,RIdx,TIdx):- alpha_beta(Board,SortIBoard,Level,T,R,Beta,-5000,Son,RIdx,TIdx).
+pruning(Board,SortIBoard,Level,T,R,Beta,5000,Son,RIdx,TIdx):- alpha_beta(Board,SortIBoard,Level,T,R,Beta,5000,Son,RIdx,TIdx).
 pruning(Board,SortIBoard,Level,T,R,Beta,Father,Son,RIdx,TIdx):- 0 is mod(Level,2),Father<Beta,alpha_beta(Board,SortIBoard,Level,T,R,Beta,Father,Son,RIdx,TIdx).
 pruning(Board,SortIBoard,Level,T,R,Beta,Father,Son,RIdx,TIdx):- 1 is mod(Level,2),Father>Beta,alpha_beta(Board,SortIBoard,Level,T,R,Beta,Father,Son,RIdx,TIdx).
 pruning(_,_,_,_,Beta,Beta,_,_,_,_).
 
 alpha_beta(_,[],_,_,R,R,_,_,RIdx,RIdx).
-alpha_beta(Board,_,4,_,R,_,_,_,RIdx,RIdx):- compute_H(Board,R).
+alpha_beta(Board,_,3,T,R,_,_,_,RIdx,RIdx):- compute_H(Board,R,T).
 alpha_beta(Board,[Idxs|TailSortIBoard],Level,T,R,Beta,Father,Son,RIdx,TIdx):- Nextlevel is Level + 1,
 					another_player(T,T1),
 					defult_value(Nextlevel,Beta1),
@@ -618,30 +631,30 @@ alpha_beta(Board,[Idxs|TailSortIBoard],Level,T,R,Beta,Father,Son,RIdx,TIdx):- Ne
 					min_max(Nextlevel,Alpha1,Beta,Beta2,RIdx2,TIdx,Idxs),
 					pruning(Board,TailSortIBoard,Level,T,R,Beta2,Father,Beta2,RIdx,RIdx2).
 
-h4(Board,NewBoard,T):- rules(Board,1,T,R,-50,50,50,RIdx,-50),
+h4(Board,NewBoard,T):- rules(Board,1,T,R,-5000,5000,5000,RIdx,-5000),
 				add_piece(Board,NewBoard1,T,RIdx), 
 				computer_check_triple(NewBoard1,RIdx,T,NewBoard),
 				write('*** '),write(R),nl,write(RIdx),nl,computer_print_add(RIdx).				
 
-rules(Board,Level,T,R,Beta,_,Son,RIdx,_):- Level<4,
+rules(Board,Level,T,R,Beta,_,Son,RIdx,_):- Level<3,
 						h2(Board,NewBoard1,T,RIdx),
 						Nextlevel is Level + 1,
 						another_player(T,T1),
 						defult_value(Nextlevel,Beta1),
 						rules(NewBoard1,Nextlevel,T1,R,Beta1,Son,Beta1,RIdx1,RIdx).
-rules(Board,Level,T,R,Beta,_,Son,RIdx,_):- Level<4,
+rules(Board,Level,T,R,Beta,_,Son,RIdx,_):- Level<3,
 						h5(Board,NewBoard1,T,RIdx),
 						Nextlevel is Level + 1,
 						another_player(T,T1),
 						defult_value(Nextlevel,Beta1),
 						rules(NewBoard1,Nextlevel,T1,R,Beta1,Son,Beta1,RIdx1,RIdx).
-rules(Board,Level,T,R,Beta,_,Son,RIdx,_):- Level<4,
+rules(Board,Level,T,R,Beta,_,Son,RIdx,_):- Level<3,
 						h1(Board,NewBoard1,T,RIdx),
 						Nextlevel is Level + 1,
 						another_player(T,T1),
 						defult_value(Nextlevel,Beta1),
 						rules(NewBoard1,Nextlevel,T1,R,Beta1,Son,Beta1,RIdx1,RIdx).
-rules(Board,Level,T,R,Beta,_,Son,RIdx,_):- Level<4,
+rules(Board,Level,T,R,Beta,_,Son,RIdx,_):- Level<3,
 						h6(Board,NewBoard1,T,RIdx),
 						Nextlevel is Level + 1,
 						another_player(T,T1), 
@@ -696,7 +709,7 @@ move_min_max(Level,R1,R2,R,RIdx,OIdx,NIdx,BIdx,OBIdx,NBIdx):- 0 is mod(Level,2),
 move_min_max(_,R1,R2,R,RIdx,OIdx,NIdx,BIdx,OBIdx,NBIdx):- move_min(R1,R2,R,RIdx,OIdx,NIdx,BIdx,OBIdx,NBIdx).
 
 move_alpha_beta(_,[],[],_,_,R,R,_,_,RIdx,RIdx,OIdx,OIdx).
-move_alpha_beta(Board,_,_,4,_,R,_,_,_,RIdx,RIdx,OIdx,OIdx):- compute_H(Board,R)/*,write(R),write(' '),write(Board),nl*/.
+move_alpha_beta(Board,_,_,4,T,R,_,_,_,RIdx,RIdx,OIdx,OIdx):- compute_H(Board,R,T)/*,write(R),write(' '),write(Board),nl*/.
 move_alpha_beta(Board,[Idxs|TailSortIBoard],[OIdxs|OTailSortIBoard],Level,T,R,Beta,Father,Son,RIdx,TIdx,OIdx,TOIdx):- Nextlevel is Level + 1,
 					another_player(T,T1),
 					defult_value(Nextlevel,Beta1),
@@ -706,10 +719,10 @@ move_alpha_beta(Board,[Idxs|TailSortIBoard],[OIdxs|OTailSortIBoard],Level,T,R,Be
 					move_min_max(Nextlevel,Alpha1,Beta,Beta2,RIdx2,TIdx,Idxs,OIdx2,TOIdx,OIdxs),
 					move_pruning(Board,TailSortIBoard,OTailSortIBoard,Level,T,R,Beta2,Father,Beta2,RIdx,RIdx2,OIdx,OIdx2).
 
-move_pruning(Board,SortIBoard,OSortIBoard,Level,T,R,Beta,-50,Son,RIdx,TIdx,OIdx,TOIdx):- 
-					move_alpha_beta(Board,SortIBoard,OSortIBoard,Level,T,R,Beta,-50,Son,RIdx,TIdx,OIdx,TOIdx).
-move_pruning(Board,SortIBoard,OSortIBoard,Level,T,R,Beta,50,Son,RIdx,TIdx,OIdx,TOIdx):- 
-					move_alpha_beta(Board,SortIBoard,OSortIBoard,Level,T,R,Beta,50,Son,RIdx,TIdx,OIdx,TOIdx).
+move_pruning(Board,SortIBoard,OSortIBoard,Level,T,R,Beta,-5000,Son,RIdx,TIdx,OIdx,TOIdx):- 
+					move_alpha_beta(Board,SortIBoard,OSortIBoard,Level,T,R,Beta,-5000,Son,RIdx,TIdx,OIdx,TOIdx).
+move_pruning(Board,SortIBoard,OSortIBoard,Level,T,R,Beta,5000,Son,RIdx,TIdx,OIdx,TOIdx):- 
+					move_alpha_beta(Board,SortIBoard,OSortIBoard,Level,T,R,Beta,5000,Son,RIdx,TIdx,OIdx,TOIdx).
 move_pruning(Board,SortIBoard,OSortIBoard,Level,T,R,Beta,Father,Son,RIdx,TIdx,OIdx,TOIdx):- 0 is mod(Level,2),
 					Father<Beta,
 					move_alpha_beta(Board,SortIBoard,OSortIBoard,Level,T,R,Beta,Father,Son,RIdx,TIdx,OIdx,TOIdx).
@@ -742,7 +755,7 @@ move_rules(Board,Level,T,R,Beta,Father,Son,RIdx,TIdx,OIdx,TOIdx):- move_weight_B
 									flatten(TBoard,TBoard1),
 									move_alpha_beta(Board,TBoard1,EBoard1,Level,T,R,Beta,Father,Son,RIdx,TIdx,OIdx,TOIdx).
 
-h13(Board,NewBoard,T):- move_rules(Board,1,T,R,-50,50,50,RIdx,-50,OIdx,-50),
+h13(Board,NewBoard,T):- move_rules(Board,1,T,R,-5000,5000,5000,RIdx,-5000,OIdx,-5000),
 				add_piece(Board,NewBoard1,T,RIdx), 
 				remove_piece(NewBoard1,NewBoard2,OIdx),
 				computer_check_triple(NewBoard2,RIdx,T,NewBoard),
@@ -836,6 +849,6 @@ kk:- print_board(['a','e','e','e','b','e','e','e','e','e','e','e','e','e','e','e
 yy:- h14(['e','b','e','a','a','a','b','e','e','e','b','e','e','b','e','e','e','e','e','e','e','e','e','e'],NewBoard,'a',OP,NP),print_board(NewBoard),nl.
 ww:- count_piece(['e','b','e','a','a','a','b','e','e','e','b','e','e','b','e','e','e','b','e','b','e','e','e','e'],R1,R2,0,0),write(R1),write(' '),write(R2),nl.
 ll:- delete_rules(['b','b','a','e','b','e','a','b','e','e','a','e','e','e','e','e','e','e','e','e','e','e','e','a'],NewBoard,'b'),print_board(NewBoard),nl.
-
+vv:- compute_H(['e','b','e','b','b','b','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e','e'],R,'b'),write(R),nl.
 
 
