@@ -1,4 +1,7 @@
 
+%dynamic facts to draw situation
+:-dynamic draw/2.
+
 % e empty position
 % a first player
 % b second player
@@ -756,9 +759,24 @@ h13(Board,NewBoard,T):- move_rules(Board,1,T,_,-5000,5000,5000,RIdx,-5000,OIdx,-
 				computer_check_triple(NewBoard2,RIdx,T,NewBoard),
 				computer_print_move(OIdx,RIdx).
 
+check_draw(N):- N0 is N-1,draw(N0,Board0),
+		N1 is N-2, draw(N1,Board1),
+		N2 is N-3, draw(N2,Board2),
+		=(Board0,Board2),
+		N3 is N-4, draw(N3,Board3),
+		=(Board1,Board3),
+		N4 is N-5, draw(N4,Board4),
+		=(Board2,Board4),
+		N5 is N-6, draw(N5,Board5),
+		=(Board3,Board5).
 %************************************************************************************
 
 %playing the game
+
+%Draw situation
+play(_,_,50):- wirte('THe game is finished ***Draw*** More than 50 round'),nl.
+play(_,_,N):- check_draw(N).
+
 %the first part of the game (add pieces)
 %************************************************************************************
 %The player turn
@@ -773,25 +791,18 @@ play(Board,T,N):- 1 is (N mod 2),N<19,write('Incorrect, this position is not ava
 
 %Compter think for the game
 %add piece
-%H1: make two choices for example if you have two pieces (1,4) & (4,1) play the piece in position (1,1).
-%H2: if there are two pieces in the same row or in the same column play the third one for example of you have (1,1) & (1,4) play (1,7).
-%H3: try to make two choices for example if you have (1,4) play (4,1) to apply H1 the next time.
-%H4: Choose position with big number of connections.
-%H5: prevent the other player to have triple.
-%H6: prevent the other player to have two choices.
-%priority order: h6,h2,h1,h5,h3,h4
-%delete piece
-%H7 delete the main piece if the player have two choices.
-%H8 delete one of two pieces in the same row or column to prevent the another player to get triple.
-%H9 delete on of two pieces will make two choices with add another piece
-%H10 delete a piece with a big number of connections
-%move piece
-%H11 if the player can have a triple in one move
-%H12 prevent the other player to have triple by move one piece
 %************************************************************************************
 %The Computer turn
 
-play(Board,T,N):-  0 is (N mod 2),N<19,h4(Board,NewBoard,T), another_player(T,T1),N1 is N+1,play(NewBoard,T1,N1).
+play(Board,T,N):-  0 is (N mod 2),
+			N<19,
+			h4(Board,NewBoard,T), 
+			another_player(T,T1),
+			N1 is N+1,
+			play(NewBoard,T1,N1),
+			Nl is N - 1,
+			assert(draw(Nl,Board)),
+			assert(draw(N,NewBoard)).
 %************************************************************************************
 %the second part of the game (move the pieces)
 %************************************************************************************
@@ -817,7 +828,14 @@ play(Board,T,N):- 1 is (N mod 2),write('Incorrect, this move is not available'),
 
 /*play(Board,T,N):- 0 is (N mod 2),write('add triple'),h11(Board,NewBoard,T),another_player(T,T1),N1 is N+1,play(NewBoard,T1,N1),!.
 play(Board,T,N):- 0 is (N mod 2),write('prevent triple'),h12(Board,NewBoard,T),another_player(T,T1),N1 is N+1,play(NewBoard,T1,N1),!.*/
-play(Board,T,N):- 0 is (N mod 2),write('remove triple'),h13(Board,NewBoard,T),another_player(T,T1),N1 is N+1,play(NewBoard,T1,N1),!.
+play(Board,T,N):- 0 is (N mod 2),
+			h13(Board,NewBoard,T),
+			another_player(T,T1),
+			N1 is N+1,
+			play(NewBoard,T1,N1),
+			Nl is N - 1,
+			assert(draw(Nl,Board)),
+			assert(draw(N,NewBoard)).
 /*play(Board,T,N):- 0 is (N mod 2),write('prevent the other to remove triple'),h14(Board,NewBoard,T),another_player(T,T1),N1 is N+1,play(NewBoard,T1,N1),!.*/
 
 
